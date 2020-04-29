@@ -1,5 +1,5 @@
 const express = require('express');
-const config = require('./config/index')
+const config = require('./config/index');
 const app = express();
 
 app.use(express.json());
