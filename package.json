@@ -31,8 +31,13 @@
   },
   "homepage": "https://github.com/Sphinx-Society/kaizen-bakend#readme",
   "dependencies": {
+    "app-root-path": "^3.0.0",
+    "create-if-not-exist": "0.0.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "mongodb": "^3.5.6"
+  },
+  "devDependencies": {
+    "winston": "^3.2.1"
   }
 }
