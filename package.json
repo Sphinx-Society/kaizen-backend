@@ -32,8 +32,13 @@
   "homepage": "https://github.com/Sphinx-Society/kaizen-bakend#readme",
   "dependencies": {
     "app-root-path": "^3.0.0",
+    "babel-eslint": "^10.1.0",
     "create-if-not-exist": "0.0.2",
     "dotenv": "^8.2.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
     "express": "^4.17.1",
     "mongodb": "^3.5.6"
   },
