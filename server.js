@@ -8,7 +8,7 @@ app.get('/', (req, res, next) => {
   try {
     res.status(200)
       .send({
-        "api":"Kaizen Backend",
+        "api": "Kaizen Backend",
         "version": "1.0.0",
         "git version": ""
       });
