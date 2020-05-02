@@ -38,9 +38,5 @@ jobs:
       - name: Build and push
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:push -a ${{ secrets.HEROKU_APP_NAME }} web
-
-      - name: Release
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release -a ${{ secrets.HEROKU_APP_NAME }} web
+        if: github.ref == 'refs/heads/master' && job.status == 'success'
+        run: git push ${{ secrets.HEROKU_APP_NAME }} origin/master:masterb
