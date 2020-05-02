@@ -73,6 +73,7 @@ lib-cov
 *.lcov
 
 # nyc test coverage
+coverage/
 .nyc_output
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
@@ -267,5 +268,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Jest
+__test__
 
 # End of https://www.gitignore.io/api/node,linux,macos,dotenv,windows,webstorm
