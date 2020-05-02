@@ -4,7 +4,8 @@
   "description": "Backend for medical tests manage system",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "start": "node start"
   },
   "repository": {
     "type": "git",
