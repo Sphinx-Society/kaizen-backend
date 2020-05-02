@@ -15,9 +15,11 @@ assignees: ''
 - [x] Related issue has been created
 - [x] Commits messages follows [commit guideline](https://github.com/Sphinx-Society/kaizen-backend) 
 
-solves [Issue ID]
+resolves [Issue ID]
 
 <!-- Replace [Issue ID] with the issue id -->
+
+
 
 
 
