@@ -39,4 +39,5 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         if: github.ref == 'refs/heads/master' && job.status == 'success'
-        run: git push ${{ secrets.HEROKU_APP_NAME }} origin/master:masterb
+        run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git origin/master:master
+
