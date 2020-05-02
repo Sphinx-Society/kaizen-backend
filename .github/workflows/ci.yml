@@ -32,10 +32,9 @@ jobs:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:login
 
-      - name: Add remote origin
-        run: |
-          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-
       - name: Deploy to Heroku
-        run: |
-          git fetch --all --unshallow && git push heroku HEAD:master -f
+        env:
+          HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        if: github.ref == 'refs/heads/master' && job.status == 'success'
+        run: git push https://heroku:HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git origin/master:master
