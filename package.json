@@ -4,11 +4,12 @@
   "description": "Backend for medical tests manage system",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sphinx-Society/kaizen-bakend.git"
+    "url": "git+https://github.com/Sphinx-Society/kaizen-backend.git"
   },
   "keywords": [
     "Node",
@@ -27,9 +28,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Sphinx-Society/kaizen-bakend/issues"
+    "url": "https://github.com/Sphinx-Society/kaizen-backend/issues"
   },
-  "homepage": "https://github.com/Sphinx-Society/kaizen-bakend#readme",
+  "homepage": "https://github.com/Sphinx-Society/kaizen-backend#readme",
   "dependencies": {
     "app-root-path": "^3.0.0",
     "babel-eslint": "^10.1.0",
@@ -44,6 +45,8 @@
   },
   "devDependencies": {
     "eslint-plugin-react": "^7.19.0",
+    "jest": "^25.5.3",
+    "mongodb-memory-server": "^6.5.2",
     "winston": "^3.2.1"
   }
 }
