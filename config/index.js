@@ -5,6 +5,7 @@ dotenv.config();
 module.exports = {
   server: {
     port: process.env.PORT,
+    sessionKey: process.env.SESSION_KEY
   },
   mongo: {
     host: process.env.MONGO_HOST,
