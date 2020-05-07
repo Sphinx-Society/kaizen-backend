@@ -1,8 +1,15 @@
 const express = require('express');
+const session = require('express-session');
 const config = require('./config/index');
 const app = express();
 
 app.use(express.json());
+
+app.use(session({
+  secret: config.server.sessionKey,
+  resave: true,
+  saveUninitialized: true
+}));
 
 app.get('/', (req, res, next) => {
   try {
