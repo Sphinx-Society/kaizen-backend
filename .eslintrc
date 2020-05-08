@@ -87,7 +87,9 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": "**/*.test.js"
+        "devDependencies": [
+          "**/*.test.js"
+        ]
       }
     ],
     "key-spacing": [
