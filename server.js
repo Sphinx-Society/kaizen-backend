@@ -2,12 +2,12 @@ const express = require('express');
 const session = require('express-session');
 const Routes = require('./api/routes');
 const config = require('./config/index');
-const notFoundHandler = require('./utils/middleware/notFoundHandler');
+const notFoundHandler = require('./middleware/notFoundHandler');
 const {
   logErrors,
   wrapErrors,
   errorHandler,
-} = require('./utils/middleware/errorHandlers.js');
+} = require('./middleware/errorHandlers.js');
 
 const app = express();
 
@@ -37,8 +37,8 @@ app.get('/', (req, res, next) => {
 
 app.use(notFoundHandler);
 
-app.use(logErrors);
 app.use(wrapErrors);
+app.use(logErrors);
 app.use(errorHandler);
 
 const server = app.listen(config.server.port, () => {
