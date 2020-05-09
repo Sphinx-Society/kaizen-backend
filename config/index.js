@@ -9,6 +9,9 @@ module.exports = {
     port: process.env.PORT,
     sessionKey: process.env.SESSION_KEY,
   },
+  api: {
+    version: process.env.API_VERSION,
+  },
   mongo: {
     host: process.env.MONGO_HOST,
     user: process.env.MONGO_USER,
