@@ -224,6 +224,13 @@
         "args": "none"
       }
     ],
+    "no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "classes": true
+      }
+    ],
     "no-var": 2,
     "no-void": 0,
     "no-warning-comments": 0,
