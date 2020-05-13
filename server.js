@@ -44,3 +44,5 @@ app.use(errorHandler);
 const server = app.listen(config.server.port, () => {
   console.log(`Server is listening at ${config.server.host}:${server.address().port}`);
 });
+
+module.exports = server;
