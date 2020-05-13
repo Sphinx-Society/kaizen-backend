@@ -26,7 +26,6 @@ function withErrorStack(error, stack) {
  * @param {*} next
  */
 function logErrors(err, req, res, next) {
-  console.log('logErrors -> err', err);
 
   if (err) {
     const logger = new LoggerService();

@@ -20,7 +20,7 @@ class MongoLib {
 
   /**
    * Creates an instance of MongoLib.
-   * @returns {}
+   * @returns {} Object
    * @memberof MongoLib
    */
   connect() {
@@ -41,7 +41,7 @@ class MongoLib {
    * Method that list the collection and filtered with a query
    * @param {*} collection
    * @param {*} query
-   * @returns
+   * @returns Object
    * @memberof MongoLib
    */
   list(collection, query) {
@@ -54,7 +54,7 @@ class MongoLib {
    * Method that retrieve an item of the collection by uid
    * @param {*} collection
    * @param {*} id
-   * @returns
+   * @returns Object
    * @memberof MongoLib
    */
   get(collection, id) {
@@ -64,10 +64,24 @@ class MongoLib {
   }
 
   /**
+   * Method that receives a query and return the number of coincidences.
+   *
+   * @param {*} collection
+   * @param {*} query
+   * @returns Number
+   * @memberof MongoLib
+   */
+  findAndCount(collection, query) {
+    return this.connect().then((db) => {
+      return db.collection(collection).find(query).count();
+    }).catch((error) => error);
+  }
+
+  /**
    * Method that insert an item in the collection
    * @param {*} collection
    * @param {*} data
-   * @returns
+   * @returns Object
    * @memberof MongoLib
    */
   insert(collection, data) {
@@ -86,7 +100,7 @@ class MongoLib {
    * @param {*} collection
    * @param {*} id
    * @param {*} data
-   * @returns
+   * @returns Object
    * @memberof MongoLib
    */
   update(collection, id, data) {
@@ -104,7 +118,7 @@ class MongoLib {
    * Method that delete an item of the collection
    * @param {*} collection
    * @param {*} id
-   * @returns
+   * @returns Object
    * @memberof MongoLib
    */
   delete(collection, id) {
