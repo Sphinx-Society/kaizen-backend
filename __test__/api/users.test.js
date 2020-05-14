@@ -189,4 +189,16 @@ describe('Testing the users API', () => {
     await done();
 
   });
+
+  it('Should test the get users endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).get(`/api/${config.api.version}/users`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    await app.close();
+    await done();
+
+  });
 });

@@ -2,8 +2,6 @@ const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
 
-//TODO test this
-
 /**
  * Controller that validate the request information and sends it to the store
  * @param  {} injectedStore
@@ -57,8 +55,22 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Function that list the active users. It can receive a query to filter the search.
+   *
+   * @param {*} query
+   * @returns Promise of retrieve the filtered list of users.
+   */
+  async function listUsers(query) {
+
+    searchQuery = { ...query, 'auth.active': true };
+    const users = await store.list(TABLE, searchQuery);
+    return users;
+  }
+
   return {
     insertUser,
+    listUsers,
   };
 };
 
