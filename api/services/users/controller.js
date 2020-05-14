@@ -56,16 +56,32 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that list the active users. It can receive a query to filter the search.
+   * Function that list the active users using pagination by sending the number of the page.
    *
    * @param {*} query
    * @returns Promise of retrieve the filtered list of users.
    */
   async function listUsers(query) {
 
-    searchQuery = { ...query, 'auth.active': true };
-    const users = await store.list(TABLE, searchQuery);
-    return users;
+    const page = parseInt(query.page, 10);
+    const size = 3;
+    const pagination = {};
+
+    pagination.skip = size * (page - 1);
+    pagination.limit = size;
+    searchQuery = { 'auth.active': true };
+
+    const count = await store.countDocuments(TABLE, searchQuery);
+
+    const totalPages = Math.ceil(count / size);
+
+    const users = await store.list(TABLE, searchQuery, pagination);
+
+    return ({
+      users,
+      totalPages,
+      currentPage: page,
+    });
   }
 
   return {

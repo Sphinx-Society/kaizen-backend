@@ -41,7 +41,12 @@ const createUserSchema = {
   }),
 };
 
+const listUsersSchema = {
+  page: Joi.number().min(1).required(),
+};
+
 module.exports = {
   createUserSchema,
+  listUsersSchema,
 };
 

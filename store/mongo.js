@@ -44,9 +44,10 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  list(collection, query) {
+  list(collection, query, pagination) {
     return this.connect().then((db) => {
-      return db.collection(collection).find(query).toArray();
+      return db.collection(collection).find(query).skip(pagination.skip).limit(pagination.limit)
+        .toArray();
     });
   }
 
@@ -74,6 +75,19 @@ class MongoLib {
   findAndCount(collection, query) {
     return this.connect().then((db) => {
       return db.collection(collection).find(query).count();
+    }).catch((error) => error);
+  }
+
+  /**
+   * Method that return the number of documents in the collection
+   *
+   * @param {*} collection
+   * @returns
+   * @memberof MongoLib
+   */
+  countDocuments(collection, query) {
+    return this.connect().then((db) => {
+      return db.collection(collection).countDocuments(query);
     }).catch((error) => error);
   }
 

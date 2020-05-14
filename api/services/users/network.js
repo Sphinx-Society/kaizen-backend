@@ -1,7 +1,7 @@
 const express = require('express');
 const response = require('../../../network/response');
 const Controller = require('./index');
-const { createUserSchema } = require('./schema');
+const { createUserSchema, listUsersSchema } = require('./schema');
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ const router = express.Router();
 const Router = (validation) => {
 
   router.post('/', validation(createUserSchema), insertUser);
-  router.get('/', listUsers);
+  router.get('/', validation(listUsersSchema, 'query'), listUsers);
 
   function insertUser(req, res, next) {
 
@@ -25,7 +25,7 @@ const Router = (validation) => {
 
   function listUsers(req, res, next) {
 
-    Controller.listUsers(req.body)
+    Controller.listUsers(req.query)
       .then((user) => {
         response.success(req, res, user, 200);
       })
