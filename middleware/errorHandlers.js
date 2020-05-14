@@ -1,6 +1,6 @@
 const boom = require('@hapi/boom');
-const config = require('../../config');
-const LoggerService = require('../../lib/logger');
+const config = require('../config');
+const LoggerService = require('../lib/logger');
 
 /**
  * Middleware that shows the error stack if the environment is different to production and send it to the next middleware.
@@ -26,12 +26,15 @@ function withErrorStack(error, stack) {
  * @param {*} next
  */
 function logErrors(err, req, res, next) {
-  const logger = new LoggerService();
-  logger.error('[ERROR]', {
-    output: { statusCode, payload },
-  } = err);
 
-  next(err);
+  if (err) {
+    const logger = new LoggerService();
+    logger.error('[ERROR]', {
+      output: { statusCode, payload },
+    } = err);
+
+    next(err);
+  }
 }
 
 /**
