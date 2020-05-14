@@ -3,8 +3,6 @@ const Store = require('../../../../store/mongo');
 
 const store = new Store();
 
-//TODO test this
-
 /**
  * Function that creates the username from the name, surname and last four digits of the document id,
  * then check if the user already exists in database, and create another with four random digits.

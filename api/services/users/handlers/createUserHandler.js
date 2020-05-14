@@ -1,7 +1,5 @@
 const bcrypt = require('bcrypt');
 
-//TODO test this
-
 /**
  * Function that receives the user information and auth credentials and return the user object
  * adding the auth nested object with the password encrypted.

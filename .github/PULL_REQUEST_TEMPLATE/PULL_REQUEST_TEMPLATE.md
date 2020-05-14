@@ -1,12 +1,3 @@
----
-name: "Kaizen Pull Request"
-about: PR template related to issue
-title: SSKB-
-labels: ''
-assignees: ''
-
----
-
 <!-- Thanks so much for your PR, your contribution is appreciated! -->
 
 - [x] I have followed the [Contributor guideline](https://github.com/Sphinx-Society/kaizen-backend).

@@ -1,7 +1,5 @@
 const Mailer = require('../../../../lib/mailing');
 
-//TODO test this
-
 /**
  * Function that sends the welcome email with the user credentials.
  *
