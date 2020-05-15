@@ -7,7 +7,7 @@ const createUserSuccess = {
     'avatar': '',
     'gender': 'Male',
     'country': 'MX',
-    'documentId': '1234567890',
+    'documentId': '1234567898',
   },
   'auth': {
     'email': 'me@example.com',

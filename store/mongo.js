@@ -150,7 +150,10 @@ class MongoLib {
     return this.connect().then((db) => {
       return db.collection(collection).deleteOne({ _id: ObjectId(id) });
     })
-      .then((result) => ({ deletedCount: result.deletedCount }))
+      .then((result) => ({
+        deletedId: result.deletedCount > 0 ? id : 0,
+        deletedCount: result.deletedCount,
+      }))
       .catch((error) => { throw new Error(error.errmsg); });
   }
 }

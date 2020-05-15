@@ -47,7 +47,7 @@ describe('Testing the users API', () => {
 
   });
 
-  it('Should test the post users endpoint and return a success message', async (done) => {
+  it('Should test the post users endpoint and return a success message then delete it with delete user endpoint', async (done) => {
 
     const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
 
@@ -55,6 +55,12 @@ describe('Testing the users API', () => {
     expect(response.error).toBe(false);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
 
     await app.close();
     await done();

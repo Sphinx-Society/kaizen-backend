@@ -83,6 +83,12 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
+   *
+   * @param {*} userId
+   * @returns Promise of retrieve the user object
+   */
   async function getUser(userId) {
 
     try {
@@ -93,10 +99,27 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Function that receives the userId and delete it.
+   *
+   * @param {*} userId
+   * @returns Promise of retrieve the result object { deletedId: String, deletedCount: number }
+   */
+  async function deleteUser(userId) {
+
+    try {
+      const deletedCount = await store.delete(TABLE, userId);
+      return deletedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertUser,
     listUsers,
     getUser,
+    deleteUser,
   };
 };
 
