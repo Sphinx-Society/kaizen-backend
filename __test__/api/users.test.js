@@ -201,4 +201,82 @@ describe('Testing the users API', () => {
     await done();
 
   });
+
+  it('Should test the get users endpoint with documentId parameter existing in DB and return a success message', async (done) => {
+
+    const documentId = '122345567788';
+    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message.users[0]).toHaveProperty(['profile', 'documentId'], documentId || {});
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get users endpoint with documentId parameter non-existent in DB and return a success message', async (done) => {
+
+    const documentId = '12234556778';
+    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+    expect(response.body.message.users).toEqual([]);
+
+    await app.close();
+    await done();
+
+  });
+
+  const role = [
+    ['A', 'admin'],
+    ['L', 'lab'],
+    ['P', 'patient'],
+    ['D', 'doctor'],
+  ];
+
+  test.each(role)(
+    'Should test the get users endpoint with a valid role parameter ("%s" = %s) and return a success message',
+    async (input, output) => {
+
+      const response = await supertest(app).get(`/api/${config.api.version}/users?role=${input}`);
+
+      expect(response.status).toBe(200);
+      expect(response.error).toBe(false);
+      expect(response.body.message.users[0]).toHaveProperty(['auth', 'role'], output);
+      await app.close();
+
+    },
+  );
+
+  it('Should test the get users endpoint with invalid role parameter and return an error message', async (done) => {
+
+    const response = await supertest(app).get(`/api/${config.api.version}/users?role=xyz`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe('\"Role\" must be one of [P, D, L, A, ]');
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get users endpoint with a page parameter and return a success message', async (done) => {
+
+    const page = 2;
+    const response = await supertest(app).get(`/api/${config.api.version}/users?page=${page}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message.currentPage).toBe(page);
+
+    await app.close();
+    await done();
+
+  });
 });
