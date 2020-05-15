@@ -279,4 +279,48 @@ describe('Testing the users API', () => {
     await done();
 
   });
+
+  it('Should test the get user endpoint with valid userId parameter and return an success message', async (done) => {
+
+    const userId = '5ebb7404463b3a27e8e9cea5';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message).toHaveProperty('_id', userId);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user endpoint with valid non-existent userId parameter and return an success message', async (done) => {
+
+    const userId = '5ebb7404463b3a27e8e9cea3';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message).toEqual({});
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user endpoint with invalid userId parameter and return an error message', async (done) => {
+
+    const invalidUserId = '5ebb7404463b3a27e8e9cea';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${invalidUserId}`);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe(`\"userId\" with value \"${invalidUserId}\" fails to match the required pattern: /^[0-9a-fA-F]{24}$/`);
+
+    await app.close();
+    await done();
+
+  });
 });

@@ -1,5 +1,7 @@
 const Joi = require('@hapi/joi');
 
+const userIdSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/);
+
 const createUserProfileSchema = {
   profile: Joi.object({
     name: Joi.string().label('First Name').max(100).required(),
@@ -48,6 +50,7 @@ const listUsersSchema = {
 };
 
 module.exports = {
+  userIdSchema,
   createUserSchema,
   listUsersSchema,
 };
