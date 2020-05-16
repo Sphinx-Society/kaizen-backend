@@ -1,8 +1,8 @@
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
-
-//TODO test this
+const queryParamsHandler = require('./handlers/queryParamsHandler');
+const paginationHandler = require('./handlers/paginationHandler');
 
 /**
  * Controller that validate the request information and sends it to the store
@@ -53,12 +53,39 @@ module.exports = function (InjectedStore, TABLE) {
       return userInserted;
 
     } catch (error) {
-      return error;
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Function that list the active users using pagination by sending the number of the page.
+   * If user doesn't send the page parameter by default starts in 1.
+   *
+   * @param {*} query
+   * @returns Promise of retrieve the filtered list of users.
+   */
+  async function listUsers(query) {
+
+    try {
+      const { page = 1 } = query;
+
+      const searchQuery = queryParamsHandler(query);
+      const pagination = await paginationHandler(page, store, TABLE, searchQuery);
+      const users = await store.list(TABLE, searchQuery, pagination);
+
+      return ({
+        users,
+        totalPages: pagination.totalPages,
+        currentPage: parseInt(page, 10),
+      });
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
   return {
     insertUser,
+    listUsers,
   };
 };
 

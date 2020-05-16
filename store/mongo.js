@@ -44,10 +44,13 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  list(collection, query) {
-    return this.connect().then((db) => {
-      return db.collection(collection).find(query).toArray();
-    });
+  list(collection, query, pagination) {
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).find(query).skip(pagination.skip).limit(pagination.limit)
+          .toArray();
+      })
+      .catch((error) => { throw new Error(error.errmsg); });
   }
 
   /**
@@ -58,9 +61,11 @@ class MongoLib {
    * @memberof MongoLib
    */
   get(collection, id) {
-    return this.connect().then((db) => {
-      return db.collection(collection).findOne({ _id: ObjectId(id) });
-    });
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).findOne({ _id: ObjectId(id) });
+      })
+      .catch((error) => { throw new Error(error.errmsg); });
   }
 
   /**
@@ -72,9 +77,26 @@ class MongoLib {
    * @memberof MongoLib
    */
   findAndCount(collection, query) {
-    return this.connect().then((db) => {
-      return db.collection(collection).find(query).count();
-    }).catch((error) => error);
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).find(query).count();
+      })
+      .catch((error) => { throw new Error(error.errmsg); });
+  }
+
+  /**
+   * Method that return the number of documents in the collection
+   *
+   * @param {*} collection
+   * @returns
+   * @memberof MongoLib
+   */
+  countDocuments(collection, query) {
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).countDocuments(query);
+      })
+      .catch((error) => { throw new Error(error.errmsg); });
   }
 
   /**
@@ -92,7 +114,9 @@ class MongoLib {
         {
           insertedId: result.insertedCount > 0 ? result.insertedId : 0,
           insertedCount: result.insertedCount,
-        }));
+        }))
+      .catch((error) => { throw new Error(error.errmsg); });
+
   }
 
   /**
@@ -111,7 +135,8 @@ class MongoLib {
         {
           updatedId: result.modifiedCount > 0 ? id : 0,
           updatedCount: result.modifiedCount,
-        }));
+        }))
+      .catch((error) => { throw new Error(error.errmsg); });
   }
 
   /**
@@ -125,7 +150,8 @@ class MongoLib {
     return this.connect().then((db) => {
       return db.collection(collection).deleteOne({ _id: ObjectId(id) });
     })
-      .then((result) => ({ deletedCount: result.deletedCount }));
+      .then((result) => ({ deletedCount: result.deletedCount }))
+      .catch((error) => { throw new Error(error.errmsg); });
   }
 }
 

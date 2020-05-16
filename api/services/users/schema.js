@@ -41,7 +41,14 @@ const createUserSchema = {
   }),
 };
 
+const listUsersSchema = {
+  page: Joi.number().min(1).allow(''),
+  role: Joi.string().label('Role').valid('P', 'D', 'L', 'A').allow(''),
+  documentId: Joi.string().min(4).label('Document ID').allow(''),
+};
+
 module.exports = {
   createUserSchema,
+  listUsersSchema,
 };
 
