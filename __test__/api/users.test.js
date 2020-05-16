@@ -15,6 +15,8 @@ const {
   createUserRoleError,
 } = require('../../utils/mocks/createUserMock');
 
+const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
+
 describe('Testing the users API', () => {
 
   it('Should test the API base route against its content and status', async (done) => {
@@ -328,5 +330,25 @@ describe('Testing the users API', () => {
     await app.close();
     await done();
 
+  });
+
+  it('Should test the login users endpoint and return the auth token', async (done) => {
+    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginMock);
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+    expect(response.body.message).toHaveProperty('jwt');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the login users endpoint and error', async (done) => {
+    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginFailMock);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe('Username or password is incorrect');
+
+    await app.close();
+    await done();
   });
 });

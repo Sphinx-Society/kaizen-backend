@@ -3,12 +3,13 @@ const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
+const loginUserHandler = require('./handlers/loginUser');
 
 /**
  * Controller that validate the request information and sends it to the store
  * @param  {} injectedStore
  * @param  {} TABLE
- * @returns {} CRUD functions
+ * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
  */
 module.exports = function (InjectedStore, TABLE) {
   const store = new InjectedStore();
@@ -115,11 +116,24 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Validate if user is successfully logged.
+   *
+   * @param user
+   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
+   */
+  async function loginUser(user) {
+    if (!user) {
+      throw new Error('User is required');
+    }
+    return loginUserHandler(user, store, TABLE);
+  }
+
   return {
     insertUser,
     listUsers,
     getUser,
     deleteUser,
+    loginUser,
   };
 };
-

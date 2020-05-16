@@ -15,6 +15,7 @@ const Router = (validation) => {
   router.get('/', validation(listUsersSchema, 'query'), listUsers);
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
   router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+  router.post('/login', loginUser);
 
   function insertUser(req, res, next) {
 
@@ -52,6 +53,14 @@ const Router = (validation) => {
     Controller.deleteUser(userId)
       .then((user) => {
         response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function loginUser(req, res, next) {
+    Controller.loginUser(req.body)
+      .then((data) => {
+        response.success(req, res, data, 200);
       })
       .catch(next);
   }

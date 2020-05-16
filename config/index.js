@@ -24,4 +24,7 @@ module.exports = {
     password: process.env.EMAIL_PASSWORD,
     service: process.env.EMAIL_SERVICE,
   },
+  jwt: {
+    secret: process.env.AUTH_JWT_SECRET,
+  },
 };
