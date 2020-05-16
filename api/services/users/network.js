@@ -6,7 +6,7 @@ const { userIdSchema, createUserSchema, listUsersSchema } = require('./schema');
 const router = express.Router();
 
 /**
- * users router that compare the request with the schema and if it's correct, it send it to the controller
+ * Users router that compare the request with the schema and if it's correct, it send it to the controller
  * @param  {} validation
  */
 const Router = (validation) => {
@@ -14,6 +14,7 @@ const Router = (validation) => {
   router.post('/', validation(createUserSchema), insertUser);
   router.get('/', validation(listUsersSchema, 'query'), listUsers);
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
+  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
 
   function insertUser(req, res, next) {
 
@@ -38,6 +39,17 @@ const Router = (validation) => {
     const { userId } = req.params;
 
     Controller.getUser(userId)
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function deleteUser(req, res, next) {
+
+    const { userId } = req.params;
+
+    Controller.deleteUser(userId)
       .then((user) => {
         response.success(req, res, user, 200);
       })
