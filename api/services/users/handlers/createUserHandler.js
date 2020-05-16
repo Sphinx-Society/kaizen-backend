@@ -16,7 +16,7 @@ async function createUserHandler(user, credentials) {
 
   const { username } = credentials;
   let { password } = credentials;
-  const InsertedAt = Date.now();
+  const insertedAt = Date.now();
   const active = true;
   const isConfirmed = false;
 
@@ -31,7 +31,7 @@ async function createUserHandler(user, credentials) {
       active,
       isConfirmed,
     },
-    InsertedAt,
+    insertedAt,
   };
 
   password = null;

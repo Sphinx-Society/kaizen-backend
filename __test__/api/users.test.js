@@ -15,9 +15,15 @@ const {
   createUserRoleError,
 } = require('../../utils/mocks/createUserMock');
 
+const {
+  updateUserSuccess,
+  updateUserForbiddenPropertyError,
+  updateUserInvalidPropertyError,
+} = require('../../utils/mocks/updateUserMock');
+
 const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
 
-describe('Testing the users API', () => {
+describe('Testing the GET [base] API route', () => {
 
   it('Should test the API base route against its content and status', async (done) => {
 
@@ -48,19 +54,23 @@ describe('Testing the users API', () => {
     await done();
 
   });
+});
+
+describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint and return a success message then delete it with delete user endpoint', async (done) => {
 
     const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
 
-    expect(response.status).toBe(201);
     expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
     const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
-    expect(deletedResponse.status).toBe(200);
+
     expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
     expect(deletedResponse.body.message.deletedId).toHaveLength(24);
     expect(deletedResponse.body.message.deletedCount).toBe(1);
 
@@ -197,6 +207,9 @@ describe('Testing the users API', () => {
     await done();
 
   });
+});
+
+describe('Testing the GET [users] endpoint', () => {
 
   it('Should test the get users endpoint and return a success message', async (done) => {
 
@@ -212,7 +225,7 @@ describe('Testing the users API', () => {
 
   it('Should test the get users endpoint with documentId parameter existing in DB and return a success message', async (done) => {
 
-    const documentId = '122345567788';
+    const documentId = '1234567890';
     const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
 
     expect(response.status).toBe(200);
@@ -287,10 +300,13 @@ describe('Testing the users API', () => {
     await done();
 
   });
+});
+
+describe('Testing the GET [user] endpoint', () => {
 
   it('Should test the get user endpoint with valid userId parameter and return an success message', async (done) => {
 
-    const userId = '5ebb7404463b3a27e8e9cea5';
+    const userId = '5eb8c73377d75e0b8a77d9b4';
     const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`);
 
     expect(response.status).toBe(200);
@@ -331,11 +347,13 @@ describe('Testing the users API', () => {
     await done();
 
   });
+});
 
+describe('Testing the POST [login] endpoint', () => {
   it('Should test the login users endpoint and return the auth token', async (done) => {
     const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginMock);
-    expect(response.status).toBe(200);
     expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
     expect(response.body.message).toHaveProperty('jwt');
 
     await app.close();
@@ -347,6 +365,89 @@ describe('Testing the users API', () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
     expect(response.body.message).toBe('Username or password is incorrect');
+
+    await app.close();
+    await done();
+  });
+});
+
+describe('Testing the PUT [user] endpoint', () => {
+
+  it('Should test the update users endpoint and return a success message then delete it with delete user endpoint', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}`).send(updateUserSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toHaveLength(24);
+    expect(updatedResponse.body.message.updatedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${updatedResponse.body.message.updatedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update users endpoint updating a forbidden property and return an error message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserForbiddenPropertyError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('\"auth.role\" is not allowed');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update users endpoint updating an incorrect userId and return an error message', async (done) => {
+
+    const incorrectUserId = '11111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}`).send(updateUserSuccess);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe(`\"userId\" with value \"${incorrectUserId}\" fails to match the required pattern: /^[0-9a-fA-F]{24}$/`);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update users endpoint updating an invalid property and return an error message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserInvalidPropertyError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('\"Phone number\" length must be at least 13 characters long');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update users endpoint updating an non-existent userId and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toBe(0);
+    expect(updatedResponse.body.message.updatedCount).toBe(0);
 
     await app.close();
     await done();
