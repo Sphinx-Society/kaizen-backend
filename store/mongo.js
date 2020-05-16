@@ -143,6 +143,7 @@ class MongoLib {
    * @memberof MongoLib
    */
   update(collection, id, data) {
+
     return this.connect().then((db) => {
       return db.collection(collection).updateOne({ _id: ObjectId(id) }, { $set: data }, { upsert: false });
     })

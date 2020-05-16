@@ -43,6 +43,21 @@ const createUserSchema = {
   }),
 };
 
+const updateUserSchema = {
+  profile: Joi.object().keys({
+    firstName: Joi.string().label('First Name').max(100),
+    lastName: Joi.string().label('Last Name').max(100),
+    birthDate: Joi.date().timestamp('unix').label('Birthday'),
+    phoneNumber: Joi.string().label('Phone number').min(13).max(13),
+    avatar: Joi.string().label('Profile picture').default('').allow(''),
+    gender: Joi.string().max(50).label('Gender'),
+    country: Joi.string().max(50).label('Country'),
+  }),
+  auth: Joi.object({
+    email: Joi.string().label('Email').email({ minDomainSegments: 2, tlds: false }),
+  }),
+};
+
 const listUsersSchema = {
   page: Joi.number().min(1).allow(''),
   role: Joi.string().label('Role').valid('P', 'D', 'L', 'A').allow(''),
@@ -53,5 +68,6 @@ module.exports = {
   userIdSchema,
   createUserSchema,
   listUsersSchema,
+  updateUserSchema,
 };
 

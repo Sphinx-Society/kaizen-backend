@@ -4,6 +4,7 @@ const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
+const updateObjectHandler = require('./handlers/updateObjectHandler');
 
 /**
  * Controller that validate the request information and sends it to the store
@@ -18,7 +19,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
    *
    * @param {*} user
-   * @returns {Object} Results object
+   * @returns {Promise<{ insertedId: String, insertedCount: number }>}
    */
 
   async function insertUser(user) {
@@ -63,7 +64,7 @@ module.exports = function (InjectedStore, TABLE) {
    * If user doesn't send the page parameter by default starts in 1.
    *
    * @param {*} query
-   * @returns Promise of retrieve the filtered list of users.
+   * @returns {Promise<{ users: {} }>}
    */
   async function listUsers(query) {
 
@@ -88,7 +89,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
    *
    * @param {*} userId
-   * @returns Promise of retrieve the user object
+   * @returns {Promise<{ user: {}}>}
    */
   async function getUser(userId) {
 
@@ -101,11 +102,30 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and delete it.
+   * Function that updates a user identified by userId.
    *
    * @param {*} userId
-   * @returns Promise of retrieve the result object { deletedId: String, deletedCount: number }
+   * @param {*} userData
+   * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
+  async function updateUser(userId, userData) {
+
+    try {
+      const updateUser = updateObjectHandler(userData);
+      const updatedCount = await store.update(TABLE, userId, updateUser);
+      return updatedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+ * Function that receives the userId and delete its user.
+ *
+ * @param {*} userId
+ *
+ * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+ */
   async function deleteUser(userId) {
 
     try {
@@ -117,11 +137,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Validate if user is successfully logged.
-   *
-   * @param user
-   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
-   */
+ * Validate if user is successfully logged.
+ *
+ * @param user
+ * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
+ */
   async function loginUser(user) {
     if (!user) {
       throw new Error('User is required');
@@ -133,6 +153,7 @@ module.exports = function (InjectedStore, TABLE) {
     insertUser,
     listUsers,
     getUser,
+    updateUser,
     deleteUser,
     loginUser,
   };
