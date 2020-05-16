@@ -50,7 +50,22 @@ class MongoLib {
         return db.collection(collection).find(query).skip(pagination.skip).limit(pagination.limit)
           .toArray();
       })
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
+  }
+
+  /**
+   * This function retrieves all data found it by query send.
+   *
+   * @param collection
+   * @param query
+   * @returns {Promise<unknown>}
+   */
+  search(collection, query) {
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).find(query).toArray();
+      })
+      .catch((error) => this.errorMsgHandler(error));
   }
 
   /**
@@ -65,7 +80,7 @@ class MongoLib {
       .then((db) => {
         return db.collection(collection).findOne({ _id: ObjectId(id) });
       })
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
   }
 
   /**
@@ -81,7 +96,7 @@ class MongoLib {
       .then((db) => {
         return db.collection(collection).find(query).count();
       })
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
   }
 
   /**
@@ -96,7 +111,7 @@ class MongoLib {
       .then((db) => {
         return db.collection(collection).countDocuments(query);
       })
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
   }
 
   /**
@@ -115,7 +130,7 @@ class MongoLib {
           insertedId: result.insertedCount > 0 ? result.insertedId : 0,
           insertedCount: result.insertedCount,
         }))
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
 
   }
 
@@ -136,7 +151,7 @@ class MongoLib {
           updatedId: result.modifiedCount > 0 ? id : 0,
           updatedCount: result.modifiedCount,
         }))
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
   }
 
   /**
@@ -154,7 +169,18 @@ class MongoLib {
         deletedId: result.deletedCount > 0 ? id : 0,
         deletedCount: result.deletedCount,
       }))
-      .catch((error) => { throw new Error(error.errmsg); });
+      .catch((error) => this.errorMsgHandler(error));
+  }
+
+  /**
+   * This manage the error that will be show
+   *
+   * @param error
+   */
+  errorMsgHandler(error) {
+    console.log('search error: ', error);
+    this._msg = error.errmsg || error;
+    throw new Error(this._msg);
   }
 }
 
