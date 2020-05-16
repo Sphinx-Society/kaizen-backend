@@ -83,9 +83,20 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  async function getUser(userId) {
+
+    try {
+      const user = await store.get(TABLE, userId);
+      return user || {};
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertUser,
     listUsers,
+    getUser,
   };
 };
 
