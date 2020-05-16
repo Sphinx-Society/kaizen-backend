@@ -185,6 +185,13 @@ const createUserRoleError = {
   },
 };
 
+const createUserWithoutProfileError = {
+  'auth': {
+    'email': 'me@example.com',
+    'role': 'xxx',
+  },
+};
+
 module.exports = {
   createUserSuccess,
   createUserFirstNameError,
@@ -197,4 +204,5 @@ module.exports = {
   createUserDocumentIdError,
   createUserEmailError,
   createUserRoleError,
+  createUserWithoutProfileError,
 };

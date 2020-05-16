@@ -75,10 +75,10 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  get(collection, id) {
+  get(collection, id, projection = {}) {
     return this.connect()
       .then((db) => {
-        return db.collection(collection).findOne({ _id: ObjectId(id) });
+        return db.collection(collection).findOne({ _id: ObjectId(id) }, { projection });
       })
       .catch((error) => this.errorMsgHandler(error));
   }

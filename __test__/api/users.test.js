@@ -453,3 +453,49 @@ describe('Testing the PUT [user] endpoint', () => {
     await done();
   });
 });
+
+describe('Testing the delete [user] endpoint', () => {
+  it('Should test the delete users endpoint deleting an non-existent userId and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toBe(0);
+    expect(deletedResponse.body.message.deletedCount).toBe(0);
+
+    await app.close();
+    await done();
+  });
+});
+
+describe('Testing the get [user/profile] endpoint', () => {
+
+  it('Should test the get user/profile endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const getResponse = await supertest(app).get(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`);
+
+    expect(getResponse.error).toBe(false);
+    expect(getResponse.status).toBe(200);
+    //expect(getResponse.body.message._id).toHaveLength(24);
+    expect(getResponse.body.message).toHaveProperty('profile');
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${getResponse.body.message._id}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+});
