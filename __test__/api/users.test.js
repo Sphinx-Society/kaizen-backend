@@ -19,6 +19,8 @@ const {
   updateUserSuccess,
   updateUserForbiddenPropertyError,
   updateUserInvalidPropertyError,
+  updateUserProfileSuccess,
+  updateUserProfileInvalidPropertyError,
 } = require('../../utils/mocks/updateUserMock');
 
 const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
@@ -494,6 +496,89 @@ describe('Testing the get [user/profile] endpoint', () => {
     expect(deletedResponse.status).toBe(200);
     expect(deletedResponse.body.message.deletedId).toHaveLength(24);
     expect(deletedResponse.body.message.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+});
+
+describe('Testing the PUT [user/profile] endpoint', () => {
+
+  it('Should test the update user/profile endpoint and return a success message then delete it with delete user endpoint', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`).send(updateUserProfileSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toHaveLength(24);
+    expect(updatedResponse.body.message.updatedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${updatedResponse.body.message.updatedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update user/profile endpoint updating a forbidden property and return an error message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserForbiddenPropertyError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('\"auth\" is not allowed');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update user/profile endpoint updating an incorrect userId and return an error message', async (done) => {
+
+    const incorrectUserId = '11111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}/profile`).send(updateUserProfileSuccess);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe(`\"userId\" with value "${incorrectUserId}" fails to match the required pattern: /^[0-9a-fA-F]{24}$/`);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update user/profile endpoint updating an invalid property and return an error message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileInvalidPropertyError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('\"Phone number\" length must be at least 13 characters long');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update users endpoint updating an non-existent userId and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toBe(0);
+    expect(updatedResponse.body.message.updatedCount).toBe(0);
 
     await app.close();
     await done();

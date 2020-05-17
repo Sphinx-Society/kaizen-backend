@@ -45,8 +45,34 @@ const updateUserInvalidPropertyError = {
   },
 };
 
+const updateUserProfileSuccess = {
+  'profile': {
+    'firstName': 'John',
+    'lastName': 'Doe',
+    'birthDate': 0,
+    'phoneNumber': '+523344556677',
+    'avatar': '',
+    'gender': 'Male',
+    'country': 'MX',
+  },
+};
+
+const updateUserProfileInvalidPropertyError = {
+  'profile': {
+    'firstName': 'Johana',
+    'lastName': 'Doe',
+    'birthDate': 0,
+    'phoneNumber': '+5233445566',
+    'avatar': '',
+    'gender': 'Male',
+    'country': 'MX',
+  },
+};
+
 module.exports = {
   updateUserSuccess,
   updateUserForbiddenPropertyError,
   updateUserInvalidPropertyError,
+  updateUserProfileSuccess,
+  updateUserProfileInvalidPropertyError,
 };

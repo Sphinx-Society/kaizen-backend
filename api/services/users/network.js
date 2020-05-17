@@ -1,7 +1,13 @@
 const express = require('express');
 const response = require('../../../network/response');
 const Controller = require('./index');
-const { userIdSchema, createUserSchema, listUsersSchema, updateUserSchema } = require('./schema');
+const {
+  userIdSchema,
+  createUserSchema,
+  listUsersSchema,
+  updateUserSchema,
+  updateUserProfileSchema,
+} = require('./schema');
 
 const router = express.Router();
 
@@ -16,8 +22,11 @@ const Router = (validation) => {
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
   router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
   router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+
   router.post('/login', loginUser);
+
   router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), getUserProfile);
+  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
 
   function insertUser(req, res, next) {
 
@@ -84,6 +93,18 @@ const Router = (validation) => {
     const { userId } = req.params;
 
     Controller.getUserProperty(userId, 'profile')
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function updateUserProfile(req, res, next) {
+
+    const { userId } = req.params;
+    const userData = req.body;
+
+    Controller.updateUser(userId, userData)
       .then((user) => {
         response.success(req, res, user, 200);
       })
