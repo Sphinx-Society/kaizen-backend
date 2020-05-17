@@ -8,6 +8,7 @@ const {
   updateUserSchema,
   updateUserProfileSchema,
 } = require('./schema');
+const upload = require('../../../middleware/uploader');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ const Router = (validation) => {
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
   router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
   router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+  router.post('/upload', upload, uploadImages);
 
   router.post('/login', loginUser);
 
@@ -107,6 +109,14 @@ const Router = (validation) => {
     Controller.updateUser(userId, userData)
       .then((user) => {
         response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function uploadImages(req, res, next) {
+    Controller.uploadImage(req.file, req.body.username)
+      .then((data) => {
+        response.success(req, res, data, 200);
       })
       .catch(next);
   }
