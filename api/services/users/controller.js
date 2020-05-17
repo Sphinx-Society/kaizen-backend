@@ -5,7 +5,6 @@ const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
-const searchQueryHandler = require('./handlers/searchQueryHandler');
 
 /**
  * Controller that validate the request information and sends it to the store
