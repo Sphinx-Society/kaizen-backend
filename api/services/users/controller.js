@@ -5,6 +5,7 @@ const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
+const searchQueryHandler = require('./handlers/searchQueryHandler');
 
 /**
  * Controller that validate the request information and sends it to the store
@@ -149,6 +150,27 @@ module.exports = function (InjectedStore, TABLE) {
     return loginUserHandler(user, store, TABLE);
   }
 
+  /**
+   * Function that receives the userId and a property and returns property object of the userId.
+   *
+   * @param {*} userId
+   * @returns {Promise<{ user: {profile: {}}}>}
+   */
+  async function getUserProperty(userId, property) {
+
+    try {
+      const projection = {};
+      projection[property] = 1;
+
+      const user = await store.get(TABLE, userId, projection);
+
+      return user[property] !== undefined ? user : `Property "${property}" doesn't exists in user`;
+
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertUser,
     listUsers,
@@ -156,5 +178,6 @@ module.exports = function (InjectedStore, TABLE) {
     updateUser,
     deleteUser,
     loginUser,
+    getUserProperty,
   };
 };
