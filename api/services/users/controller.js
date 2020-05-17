@@ -20,7 +20,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
    *
    * @param {*} user
-   * @returns {Object} Results object
+   * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
    */
 
   async function insertUser(user) {
@@ -65,7 +65,7 @@ module.exports = function (InjectedStore, TABLE) {
    * If user doesn't send the page parameter by default starts in 1.
    *
    * @param {*} query
-   * @returns Promise of retrieve the filtered list of users.
+   * @returns Promise<{ users: {} }>}
    */
   async function listUsers(query) {
 
@@ -90,7 +90,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
    *
    * @param {*} userId
-   * @returns Promise of retrieve the user object
+   * @returns {Promise<{ user: {}}>}
    */
   async function getUser(userId) {
 
@@ -106,7 +106,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that receives the userId and delete it.
    *
    * @param {*} userId
-   * @returns Promise of retrieve the result object { deletedId: String, deletedCount: number }
+   * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
   async function updateUser(userId, userData) {
 
