@@ -5,12 +5,13 @@ const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
+const AWS = require('../../../lib/AWS');
 
 /**
  * Controller that validate the request information and sends it to the store
  * @param  {} injectedStore
  * @param  {} TABLE
- * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
+ * @returns {} CRUD functions
  */
 module.exports = function (InjectedStore, TABLE) {
   const store = new InjectedStore();
@@ -19,7 +20,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
    *
    * @param {*} user
-   * @returns {Promise<{ insertedId: String, insertedCount: number }>}
+   * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
    */
 
   async function insertUser(user) {
@@ -64,7 +65,7 @@ module.exports = function (InjectedStore, TABLE) {
    * If user doesn't send the page parameter by default starts in 1.
    *
    * @param {*} query
-   * @returns {Promise<{ users: {} }>}
+   * @returns Promise<{ users: {} }>}
    */
   async function listUsers(query) {
 
@@ -102,10 +103,9 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that updates a user identified by userId.
+   * Function that receives the userId and delete it.
    *
    * @param {*} userId
-   * @param {*} userData
    * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
   async function updateUser(userId, userData) {
@@ -170,6 +170,18 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Get a buffer file a send to S3 bucket, and return data image from S3
+   *
+   * @param file
+   * @param username
+   * @returns {Promise<void>}
+   */
+  async function uploadImage(file, username) {
+    const aws = new AWS();
+    return aws.uploadFile(file, username);
+  }
+
   return {
     insertUser,
     listUsers,
@@ -178,5 +190,6 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUser,
     loginUser,
     getUserProperty,
+    uploadImage,
   };
 };
