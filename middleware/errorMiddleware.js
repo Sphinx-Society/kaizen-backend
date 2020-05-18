@@ -62,7 +62,7 @@ function wrapErrors(err, req, res, next) {
  * @param {*} res
  * @param {*} next
  */
-function errorHandler(err, req, res, next) {
+function errorMiddleware(err, req, res, next) {
   const {
     output: { statusCode, payload },
   } = err;
@@ -73,5 +73,5 @@ function errorHandler(err, req, res, next) {
 module.exports = {
   logErrors,
   wrapErrors,
-  errorHandler,
+  errorMiddleware,
 };
