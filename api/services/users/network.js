@@ -1,6 +1,7 @@
 const express = require('express');
 const response = require('../../../network/response');
 const Controller = require('./index');
+const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const {
   userIdSchema,
   createUserSchema,
@@ -8,7 +9,7 @@ const {
   updateUserSchema,
   updateUserProfileSchema,
 } = require('./schema');
-const upload = require('../../../middleware/uploader');
+const uploadMiddleware = require('../../../middleware/uploaderMiddleware');
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const Router = (validation) => {
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
   router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
   router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
-  router.post('/upload', upload, uploadImages);
+  router.post('/upload', jwtAuthMiddleware, uploadImages);
 
   router.post('/login', loginUser);
 

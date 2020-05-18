@@ -6,7 +6,7 @@ const boom = require('@hapi/boom');
  * @param {*} req
  * @param {*} res
  */
-function notFoundHandler(req, res) {
+function notFoundMiddleware(req, res) {
   const {
     output: { statusCode, payload },
   } = boom.notFound();
@@ -14,4 +14,4 @@ function notFoundHandler(req, res) {
   res.status(statusCode).json(payload);
 }
 
-module.exports = notFoundHandler;
+module.exports = notFoundMiddleware;
