@@ -5,6 +5,7 @@ const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
+const createUserTestHandler = require('./handlers/createUserTestHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -120,6 +121,27 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
+   * Function that add a medical test to user
+   *
+   * @param {*} userId
+   * @param {*} userData
+   * @returns Promise<{ tests: Object; }>
+   */
+  async function addTestToUser(userId, userData) {
+
+    try {
+
+      const updatedAt = Date.now();
+      const updatedData = await createUserTestHandler(store, TABLE, userId, userData);
+
+      const updatedCount = await store.update(TABLE, userId, { updatedAt }, updatedData);
+      return updatedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
  * Function that receives the userId and delete its user.
  *
  * @param {*} userId
@@ -190,6 +212,7 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUser,
     loginUser,
     getUserProperty,
+    addTestToUser,
     uploadImage,
   };
 };

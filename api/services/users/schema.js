@@ -63,11 +63,20 @@ const updateUserProfileSchema = {
   }),
 };
 
+const createUserTestSchema = {
+  tests: Joi.object({
+    testId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    testName: Joi.string().label('Test Name').max(100),
+    doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+  }),
+};
+
 module.exports = {
   userIdSchema,
   createUserSchema,
   listUsersSchema,
   updateUserSchema,
   updateUserProfileSchema,
+  createUserTestSchema,
 };
 

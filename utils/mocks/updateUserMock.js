@@ -69,10 +69,20 @@ const updateUserProfileInvalidPropertyError = {
   },
 };
 
+const createUserTestSuccess = {
+  'tests':
+  {
+    'testId': '000000000000000000000001',
+    'testName': 'Prueba de sangre',
+    'doctorId': '000000000000000000000001',
+  },
+};
+
 module.exports = {
   updateUserSuccess,
   updateUserForbiddenPropertyError,
   updateUserInvalidPropertyError,
   updateUserProfileSuccess,
   updateUserProfileInvalidPropertyError,
+  createUserTestSuccess,
 };

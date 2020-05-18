@@ -54,7 +54,7 @@ class MongoLib {
   }
 
   /**
-   * This function retrieves all data found it by query send.
+   * This function retrieves all data found it by query sent.
    *
    * @param collection
    * @param query
@@ -69,7 +69,7 @@ class MongoLib {
   }
 
   /**
-   * Method that retrieve an item of the collection by uid
+   * Method that retrieve a document of the collection by uid
    * @param {*} collection
    * @param {*} id
    * @returns Object
@@ -115,7 +115,7 @@ class MongoLib {
   }
 
   /**
-   * Method that insert an item in the collection
+   * Method that insert a document in the collection
    * @param {*} collection
    * @param {*} data
    * @returns Object
@@ -135,17 +135,22 @@ class MongoLib {
   }
 
   /**
-   * Method that update an item ot the collection
+   * Method that update a document of the collection
    * @param {*} collection
    * @param {*} id
    * @param {*} data
    * @returns Object
    * @memberof MongoLib
    */
-  update(collection, id, data) {
+  update(collection, id, setData, pushData = '') {
+
+    let query = {};
+
+    query = setData !== (undefined || null || '') ? { ...query, $set: setData } : { ...query };
+    query = pushData !== (undefined || null || '') ? { ...query, $push: pushData } : { ...query };
 
     return this.connect().then((db) => {
-      return db.collection(collection).updateOne({ _id: ObjectId(id) }, { $set: data }, { upsert: false });
+      return db.collection(collection).updateOne({ _id: ObjectId(id) }, query, { upsert: false });
     })
       .then((result) => (
         {
@@ -156,12 +161,12 @@ class MongoLib {
   }
 
   /**
-   * Method that delete an item of the collection
-   * @param {*} collection
-   * @param {*} id
-   * @returns Object
-   * @memberof MongoLib
-   */
+ * Method that delete a document of the collection
+ * @param {*} collection
+ * @param {*} id
+ * @returns Object
+ * @memberof MongoLib
+ */
   delete(collection, id) {
     return this.connect().then((db) => {
       return db.collection(collection).deleteOne({ _id: ObjectId(id) });
@@ -174,10 +179,10 @@ class MongoLib {
   }
 
   /**
-   * This manage the error that will be show
-   *
-   * @param error
-   */
+ * This manage the error that will be show
+ *
+ * @param error
+ */
   errorMsgHandler(error) {
     console.log('search error: ', error);
     this._msg = error.errmsg || error;
