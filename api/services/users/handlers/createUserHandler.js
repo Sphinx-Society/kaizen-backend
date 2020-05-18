@@ -31,6 +31,7 @@ async function createUserHandler(user, credentials) {
       active,
       isConfirmed,
     },
+    tests: [],
     insertedAt,
   };
 

@@ -21,6 +21,7 @@ const {
   updateUserInvalidPropertyError,
   updateUserProfileSuccess,
   updateUserProfileInvalidPropertyError,
+  createUserTestSuccess,
 } = require('../../utils/mocks/updateUserMock');
 
 const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
@@ -504,7 +505,7 @@ describe('Testing the get [user/profile] endpoint', () => {
 
 describe('Testing the PUT [user/profile] endpoint', () => {
 
-  it('Should test the update user/profile endpoint and return a success message then delete it with delete user endpoint', async (done) => {
+  it('Should test the update user/profile endpoint and return a success message', async (done) => {
 
     const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
 
@@ -579,6 +580,69 @@ describe('Testing the PUT [user/profile] endpoint', () => {
     expect(updatedResponse.status).toBe(200);
     expect(updatedResponse.body.message.updatedId).toBe(0);
     expect(updatedResponse.body.message.updatedCount).toBe(0);
+
+    await app.close();
+    await done();
+  });
+});
+
+describe('Testing the POST [user/tests] endpoint', () => {
+
+  it('Should test the create user/tests endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toHaveLength(24);
+    expect(updatedResponse.body.message.updatedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${updatedResponse.body.message.updatedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the create user/tests endpoint with a duplicated test and return a error message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.updatedId).toHaveLength(24);
+    expect(updatedResponse.body.message.updatedCount).toBe(1);
+
+    const createSameTestResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+
+    expect(createSameTestResponse.body.error).toBe('Bad Request');
+    expect(createSameTestResponse.status).toBe(400);
+    expect(createSameTestResponse.body.message).toBe('Error: Medical test already exists in user');
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${updatedResponse.body.message.updatedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
+    expect(deletedResponse.body.message.deletedCount).toBe(1);
 
     await app.close();
     await done();
