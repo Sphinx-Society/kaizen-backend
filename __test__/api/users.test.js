@@ -648,3 +648,47 @@ describe('Testing the POST [user/tests] endpoint', () => {
     await done();
   });
 });
+
+describe('Testing the GET [user/tests] endpoint', () => {
+  it('Should test the get user/tests endpoint and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('User doesn\'t exists');
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user/tests endpoint with "PENDING" filter and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=P`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('User doesn\'t exists');
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user/tests endpoint with "DONE" filter and return a success message', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=D`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('User doesn\'t exists');
+
+    await app.close();
+    await done();
+
+  });
+});

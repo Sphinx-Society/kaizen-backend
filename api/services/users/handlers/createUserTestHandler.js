@@ -19,7 +19,6 @@ async function createUserTestHandler(store, TABLE, userId, data) {
 
   const updatedData = { tests: { ...data.tests, 'status': 'PENDING' } };
 
-  console.log('createUserTestHandler -> updatedData', updatedData);
   return updatedData;
 }
 

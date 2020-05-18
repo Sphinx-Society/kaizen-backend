@@ -32,6 +32,7 @@ const Router = (validation) => {
   router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
 
   router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
+  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
 
   function insertUser(req, res, next) {
 
@@ -122,6 +123,17 @@ const Router = (validation) => {
     const userData = req.body;
 
     Controller.addTestToUser(userId, userData)
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function getUserTests(req, res, next) {
+
+    const { userId } = req.params;
+
+    Controller.getUserProperty(userId, 'tests', req.query)
       .then((user) => {
         response.success(req, res, user, 200);
       })

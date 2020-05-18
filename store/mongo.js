@@ -80,7 +80,9 @@ class MongoLib {
       .then((db) => {
         return db.collection(collection).findOne({ _id: ObjectId(id) }, { projection });
       })
-      .catch((error) => this.errorMsgHandler(error));
+      .catch((error) => {
+        this.errorMsgHandler(error);
+      });
   }
 
   /**
