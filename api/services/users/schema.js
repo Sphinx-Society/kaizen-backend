@@ -65,9 +65,9 @@ const updateUserProfileSchema = {
 
 const createUserTestSchema = {
   tests: Joi.object({
-    testId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
     testName: Joi.string().label('Test Name').max(100),
     doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
+    doctorName: Joi.string().label('Doctor Name').max(100),
   }),
 };
 
