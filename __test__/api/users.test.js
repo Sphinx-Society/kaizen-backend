@@ -635,7 +635,7 @@ describe('Testing the POST [user/tests] endpoint', () => {
 
     expect(createSameTestResponse.body.error).toBe('Bad Request');
     expect(createSameTestResponse.status).toBe(400);
-    expect(createSameTestResponse.body.message).toBe('Error: Medical test already exists in user');
+    expect(createSameTestResponse.body.message).toBe('Error: A pending medical test already exists in user');
 
     const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${updatedResponse.body.message.updatedId}`);
 

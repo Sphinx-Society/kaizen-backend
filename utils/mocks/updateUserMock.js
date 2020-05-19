@@ -72,9 +72,9 @@ const updateUserProfileInvalidPropertyError = {
 const createUserTestSuccess = {
   'tests':
   {
-    'testId': '000000000000000000000001',
     'testName': 'Prueba de sangre',
     'doctorId': '000000000000000000000001',
+    'doctorName': 'JUAN PEREZ RODRIGUEZ',
   },
 };
 
