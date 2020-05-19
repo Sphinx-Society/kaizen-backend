@@ -9,6 +9,7 @@ const {
   updateUserSchema,
   updateUserProfileSchema,
   createUserTestSchema,
+  testIdSchema,
 } = require('./schema');
 const uploadMiddleware = require('../../../middleware/uploaderMiddleware');
 
@@ -34,6 +35,7 @@ const Router = (validation) => {
 
   router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
+  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
 
   function insertUser(req, res, next) {
 
@@ -124,6 +126,17 @@ const Router = (validation) => {
     const userData = req.body;
 
     Controller.addTestToUser(userId, userData)
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function getUserTest(req, res, next) {
+
+    const { userId } = req.params;
+
+    Controller.getUserProperty(userId, 'test', req.params)
       .then((user) => {
         response.success(req, res, user, 200);
       })
