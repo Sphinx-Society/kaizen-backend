@@ -1,6 +1,7 @@
 const Joi = require('@hapi/joi');
 
 const userIdSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/);
+const testIdSchema = Joi.string().regex(/^[0-9a-zA-Z_/-]{21}$/);
 
 const createAuthUserSchema = {
   auth: Joi.object({
@@ -78,5 +79,6 @@ module.exports = {
   updateUserSchema,
   updateUserProfileSchema,
   createUserTestSchema,
+  testIdSchema,
 };
 
