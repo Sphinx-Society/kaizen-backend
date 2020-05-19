@@ -19,11 +19,11 @@ function validate(data, schema) {
  * @param {string} [check='body']
  * @returns function
  */
-function validationHandler(schema, check = 'body') {
+function validationMiddleware(schema, check = 'body') {
   return function (req, res, next) {
     const error = validate(req[check], schema);
     error ? next(boom.badRequest(error)) : next();
   };
 }
 
-module.exports = validationHandler;
+module.exports = validationMiddleware;

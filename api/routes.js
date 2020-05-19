@@ -1,5 +1,5 @@
 const user = require('./services/users/network');
-const validation = require('../middleware/validationHandler');
+const validation = require('../middleware/validationMiddleware');
 const config = require('../config');
 
 /**
