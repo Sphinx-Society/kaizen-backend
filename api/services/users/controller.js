@@ -6,6 +6,7 @@ const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
+const projectionHandler = require('./handlers/projectionHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -177,16 +178,17 @@ module.exports = function (InjectedStore, TABLE) {
    * @param {*} userId
    * @returns {Promise<{ user: {profile: {}}}>}
    */
-  async function getUserProperty(userId, property) {
+  async function getUserProperty(userId, property, filter) {
 
     try {
-      const projection = {};
-      projection[property] = 1;
 
-      const user = await store.get(TABLE, userId, projection);
+      const queryProjection = projectionHandler(property, filter);
 
-      return user[property] !== undefined ? user : `Property "${property}" doesn't exists in user`;
+      const user = await store.get(TABLE, userId, queryProjection);
 
+      if (!user) return 'User doesn\'t exists';
+
+      return user[property] !== undefined ? { ...user } : `Property "${property}" doesn't exists in user`;
     } catch (error) {
       throw new Error(error);
     }
