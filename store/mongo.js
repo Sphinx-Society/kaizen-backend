@@ -138,9 +138,10 @@ class MongoLib {
 
   /**
    * Method that update a document of the collection
-   * @param {*} collection
-   * @param {*} id
-   * @param {*} data
+   * @param {*} collection String
+   * @param filter Object
+   * @param setData Object
+   * @param pushData Object
    * @returns Object
    * @memberof MongoLib
    */
@@ -187,7 +188,6 @@ class MongoLib {
  * @param error
  */
   errorMsgHandler(error) {
-    console.log('search error: ', error);
     this._msg = error.errmsg || error;
     throw new Error(this._msg);
   }

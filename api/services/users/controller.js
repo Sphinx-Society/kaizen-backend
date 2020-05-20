@@ -8,6 +8,7 @@ const updateObjectHandler = require('./handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
 const projectionHandler = require('./handlers/projectionHandler');
 const objectIdHandler = require('./handlers/objectIdHandler');
+const prefixHandler = require('./handlers/prefixHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -217,6 +218,23 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
+   * Make a request to MongoDB in order to update a medical test info, if data was be updated,
+   * the response have a property updatedCount with value 1 otherwise «zero»
+   *
+   * @param testsId
+   * @param testData
+   * @return {Promise<*>}
+   */
+  async function updateMedicalTest(testsId, testData) {
+    try {
+      const updateUser = prefixHandler('tests', testData);
+      return await store.update(TABLE, { 'tests.testId': testsId }, updateUser);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
    * Get a buffer file a send to S3 bucket, and return data image from S3
    *
    * @param file
@@ -239,5 +257,6 @@ module.exports = function (InjectedStore, TABLE) {
     addTestToUser,
     deleteUserTest,
     uploadImage,
+    updateMedicalTest,
   };
 };
