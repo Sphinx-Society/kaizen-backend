@@ -144,7 +144,7 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  update(collection, id, setData, pushData = '') {
+  update(collection, filter, setData, pushData = '') {
 
     let query = {};
 
@@ -152,13 +152,14 @@ class MongoLib {
     query = pushData !== (undefined || null || '') ? { ...query, $push: pushData } : { ...query };
 
     return this.connect().then((db) => {
-      return db.collection(collection).updateOne({ _id: ObjectId(id) }, query, { upsert: false });
+      return db.collection(collection).updateOne(filter, query, { upsert: false });
     })
-      .then((result) => (
-        {
-          updatedId: result.modifiedCount > 0 ? id : 0,
+      .then((result) => {
+        return {
+          matchedCount: result.matchedCount,
           updatedCount: result.modifiedCount,
-        }))
+        };
+      })
       .catch((error) => this.errorMsgHandler(error));
   }
 

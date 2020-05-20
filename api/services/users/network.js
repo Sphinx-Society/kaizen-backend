@@ -37,6 +37,8 @@ const Router = (validation) => {
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
   router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
 
+  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
+
   function insertUser(req, res, next) {
 
     Controller.insertUser(req.body)
@@ -148,6 +150,17 @@ const Router = (validation) => {
     const { userId } = req.params;
 
     Controller.getUserProperty(userId, 'tests', req.query)
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function deleteUserTest(req, res, next) {
+
+    const { testId } = req.params;
+
+    Controller.deleteUserTest(testId)
       .then((user) => {
         response.success(req, res, user, 200);
       })
