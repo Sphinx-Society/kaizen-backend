@@ -36,6 +36,7 @@ const Router = (validation) => {
   router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
   router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
+  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
 
   router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
@@ -161,6 +162,17 @@ const Router = (validation) => {
     const { testId } = req.params;
 
     Controller.deleteUserTest(testId)
+      .then((user) => {
+        response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function updateMedicalTest(req, res, next) {
+    const { testId } = req.params;
+    const testData = req.body;
+
+    Controller.updateMedicalTest(testId, testData)
       .then((user) => {
         response.success(req, res, user, 200);
       })

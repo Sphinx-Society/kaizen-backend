@@ -742,3 +742,60 @@ describe('Testing the DELETE [user/test] endpoint', () => {
     await done();
   });
 });
+
+describe('Testing the PUT [user/test] endpoint', () => {
+  it('Should test the update user/test endpoint and return a success message', async (done) => {
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const payload = {
+      'testName': 'Análisis Sanguineo',
+      'doctorName': 'José Francisco',
+      'doctorId': '5e30b94546fc3f5c223c4254',
+      'status': 'DONE',
+    };
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}`)
+      .send(payload);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty('matchedCount');
+    expect(response.body.message.matchedCount).toBe(1);
+    expect(response.body.message).toHaveProperty('modifiedCount');
+    expect(response.body.message.updatedCount).toBe(1);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the update user/test endpoint and return a message with zero modifiedCount', async (done) => {
+
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fr';
+    const payload = {
+      'testName': 'Análisis Sanguineo',
+      'doctorName': 'Juan Francisco',
+      'doctorId': '5e30b94546fc3f5c223c4254',
+      'status': 'PENDING',
+    };
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}`)
+      .send(payload);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty('matchedCount');
+    expect(response.body.message.matchedCount).toBe(0);
+    expect(response.body.message).toHaveProperty('modifiedCount');
+    expect(response.body.message.updatedCount).toBe(0);
+
+    await app.close();
+    await done();
+
+  });
+
+});
+
