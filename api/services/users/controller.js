@@ -7,6 +7,7 @@ const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
 const projectionHandler = require('./handlers/projectionHandler');
+const objectIdHandler = require('./handlers/objectIdHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -113,29 +114,9 @@ module.exports = function (InjectedStore, TABLE) {
   async function updateUser(userId, userData) {
 
     try {
+      const id = objectIdHandler(userId);
       const updateUser = updateObjectHandler(userData);
-      const updatedCount = await store.update(TABLE, userId, updateUser);
-      return updatedCount;
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
-  /**
-   * Function that add a medical test to user
-   *
-   * @param {*} userId
-   * @param {*} userData
-   * @returns Promise<{ tests: Object; }>
-   */
-  async function addTestToUser(userId, userData) {
-
-    try {
-
-      const updatedAt = Date.now();
-      const updatedData = await createUserTestHandler(store, TABLE, userId, userData);
-
-      const updatedCount = await store.update(TABLE, userId, { updatedAt }, updatedData);
+      const updatedCount = await store.update(TABLE, id, updateUser);
       return updatedCount;
     } catch (error) {
       throw new Error(error);
@@ -153,6 +134,47 @@ module.exports = function (InjectedStore, TABLE) {
 
     try {
       const deletedCount = await store.delete(TABLE, userId);
+      return deletedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Function that add a medical test to user
+   *
+   * @param {*} userId
+   * @param {*} userData
+   * @returns Promise<{ tests: Object; }>
+   */
+  async function addTestToUser(userId, userData) {
+
+    try {
+
+      const updatedAt = Date.now();
+      const id = objectIdHandler(userId);
+      const updatedData = await createUserTestHandler(store, TABLE, userId, userData);
+
+      const updatedCount = await store.update(TABLE, id, { updatedAt }, updatedData);
+      return updatedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+ * Function that receives the userId and delete its user.
+ *
+ * @param {*} userId
+ *
+ * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+ */
+  async function deleteUserTest(userTestId) {
+
+    try {
+
+      const updatedAt = Date.now();
+      const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId }, { 'tests.$.status': 'INACTIVE', updatedAt });
       return deletedCount;
     } catch (error) {
       throw new Error(error);
@@ -215,6 +237,7 @@ module.exports = function (InjectedStore, TABLE) {
     loginUser,
     getUserProperty,
     addTestToUser,
+    deleteUserTest,
     uploadImage,
   };
 };
