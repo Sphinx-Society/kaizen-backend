@@ -150,7 +150,7 @@ const Router = (validation) => {
 
     const { userId } = req.params;
 
-    Controller.getUserProperty(userId, 'tests', req.query)
+    Controller.getTests(userId, 'tests', req.query)
       .then((user) => {
         response.success(req, res, user, 200);
       })

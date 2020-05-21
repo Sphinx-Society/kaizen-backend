@@ -218,13 +218,39 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Make a request to MongoDB in order to update a medical test info, if data was be updated,
-   * the response have a property updatedCount with value 1 otherwise «zero»
+   * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
    *
-   * @param testsId
-   * @param testData
-   * @return {Promise<*>}
+   * @param {*} userId
+   * @param {*} property
+   * @param {*} filter
+   * @returns
    */
+  async function getTests(userId, property, filter) {
+    try {
+
+      const id = objectIdHandler(userId);
+
+      const queryProjection = projectionHandler(property, filter);
+
+      const operation = [{ $match: id }, { ...queryProjection }];
+      console.log('getTests -> operation', operation);
+
+      const [result] = await store.aggregate(TABLE, operation);
+
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+ * Make a request to MongoDB in order to update a medical test info, if data was be updated,
+ * the response have a property updatedCount with value 1 otherwise «zero»
+ *
+ * @param testsId
+ * @param testData
+ * @return {Promise<*>}
+ */
   async function updateMedicalTest(testsId, testData) {
     try {
       const updateUser = prefixHandler('tests', testData);
@@ -235,12 +261,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Get a buffer file a send to S3 bucket, and return data image from S3
-   *
-   * @param file
-   * @param username
-   * @returns {Promise<void>}
-   */
+ * Get a buffer file a send to S3 bucket, and return data image from S3
+ *
+ * @param file
+ * @param username
+ * @returns {Promise<void>}
+ */
   async function uploadImage(file, username) {
     const aws = new AWS();
     return aws.uploadFile(file, username);
@@ -254,6 +280,7 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUser,
     loginUser,
     getUserProperty,
+    getTests,
     addTestToUser,
     deleteUserTest,
     uploadImage,
