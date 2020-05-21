@@ -738,7 +738,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
       'testName': 'Análisis Sanguineo',
       'doctorName': 'José Francisco',
       'doctorId': '5e30b94546fc3f5c223c4254',
-      'status': 'DONE',
+      'status': 'PENDING',
     };
 
     const response = await supertest(app)

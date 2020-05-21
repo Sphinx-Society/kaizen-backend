@@ -1,12 +1,4 @@
-/**
- * Function that validates if an object is empty.
- *
- * @param Object obj
- * @returns Boolean
- */
-function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
+const isEmpty = require('../../../../utils/helpers/objectEmpty');
 
 /**
  * Function that build a projection query depending on the type of property and filter.

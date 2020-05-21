@@ -145,12 +145,12 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  update(collection, filter, setData = '', pushData = '') {
+  update(collection, filter, setData = null, pushData = null) {
 
     let query = {};
 
-    query = setData !== (undefined || null || '') ? { ...query, $set: setData } : { ...query };
-    query = pushData !== (undefined || null || '') ? { ...query, $push: pushData } : { ...query };
+    query = setData !== null || '' ? { ...query, $set: setData } : { ...query };
+    query = pushData !== null || '' ? { ...query, $push: pushData } : { ...query };
 
     return this.connect().then((db) => {
       return db.collection(collection).updateOne(filter, query, { upsert: false });

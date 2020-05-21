@@ -233,7 +233,6 @@ module.exports = function (InjectedStore, TABLE) {
       const queryProjection = projectionHandler(property, filter);
 
       const operation = [{ $match: id }, { ...queryProjection }];
-      console.log('getTests -> operation', operation);
 
       const [result] = await store.aggregate(TABLE, operation);
 
