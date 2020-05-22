@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const app = require('../../server');
 const config = require('../../config');
+const MongoLib = require('../../store/mongo');
 const {
   createUserSuccess,
   createUserFirstNameError,
@@ -25,6 +26,8 @@ const {
 } = require('../../utils/mocks/updateUserMock');
 
 const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
+
+const store = new MongoLib();
 
 describe('Testing the GET [base] API route', () => {
 
@@ -734,11 +737,13 @@ describe('Testing the PUT [user/test] endpoint', () => {
   it('Should test the update user/test endpoint and return a success message', async (done) => {
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
+
     const payload = {
       'testName': 'Análisis Sanguineo',
       'doctorName': 'José Francisco',
       'doctorId': '5e30b94546fc3f5c223c4254',
-      'status': 'PENDING',
+      'status': values[Math.floor(Math.random() * values.length)],
     };
 
     const response = await supertest(app)
@@ -757,7 +762,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
   });
 
-  it('Should test the update user/test endpoint and return a message with zero modifiedCount', async (done) => {
+  it('Should test the update user/test endpoint and return a message with zero updatedCount', async (done) => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fr';
@@ -786,3 +791,103 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
 });
 
+describe('Testing the PUT [user/results] endpoint', () => {
+  it('Should test the update user/test/results endpoint and return a success message', async (done) => {
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
+
+    const payload = {
+      'results': {
+        'COVID-19': values[Math.floor(Math.random() * values.length)],
+        'SARS': values[Math.floor(Math.random() * values.length)],
+        'MERS': values[Math.floor(Math.random() * values.length)],
+      },
+    };
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
+      .send(payload);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty('matchedCount');
+    expect(response.body.message.matchedCount).toBe(1);
+    expect(response.body.message).toHaveProperty('updatedCount');
+    expect(response.body.message.updatedCount).toBe(1);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the update user/test/results endpoint and return a success message', async (done) => {
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
+
+    const payload = {
+      'results': {
+        'COVID-19': values[Math.floor(Math.random() * values.length)],
+        'SARS': values[Math.floor(Math.random() * values.length)],
+        'MERS': values[Math.floor(Math.random() * values.length)],
+      },
+    };
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
+      .send(payload);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty('matchedCount');
+    expect(response.body.message.matchedCount).toBe(1);
+    expect(response.body.message).toHaveProperty('updatedCount');
+    expect(response.body.message.updatedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update user/test/results endpoint and return a fail message advising about key ', async (done) => {
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
+
+    const payload = {
+      'result': {
+        'COVID-19': values[Math.floor(Math.random() * values.length)],
+        'SARS': values[Math.floor(Math.random() * values.length)],
+        'MERS': values[Math.floor(Math.random() * values.length)],
+      },
+    };
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
+      .send(payload);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe('Error: Object to update must contain results key');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update user/test/results endpoint and return a fail message advising about empty payload ', async (done) => {
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const payload = {};
+
+    const response = await supertest(app)
+      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
+      .send(payload);
+
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe('Error: Object to update must not be empty');
+
+    await app.close();
+    await done();
+  });
+});

@@ -40,6 +40,8 @@ const Router = (validation) => {
 
   router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
+  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+
   function insertUser(req, res, next) {
 
     Controller.insertUser(req.body)
@@ -183,6 +185,17 @@ const Router = (validation) => {
     Controller.uploadImage(req.file, req.body.username)
       .then((data) => {
         response.success(req, res, data, 200);
+      })
+      .catch(next);
+  }
+
+  function upsertMedicalResults(req, res, next) {
+    const { testId } = req.params;
+    const testResultsData = req.body;
+
+    Controller.upsertMedicalResultsData(testId, testResultsData)
+      .then((user) => {
+        response.success(req, res, user, 200);
       })
       .catch(next);
   }

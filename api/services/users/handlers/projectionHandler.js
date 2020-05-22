@@ -1,4 +1,4 @@
-const isEmpty = require('../../../../utils/helpers/objectEmpty');
+const { isEmpty } = require('../../../../utils/helpers/objectHelper');
 
 /**
  * Function that build a projection query depending on the type of property and filter.
