@@ -40,7 +40,7 @@ const Router = (validation) => {
 
   router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
-  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), uspertMedicalResults);
+  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
 
   function insertUser(req, res, next) {
 
@@ -189,11 +189,11 @@ const Router = (validation) => {
       .catch(next);
   }
 
-  function uspertMedicalResults(req, res, next) {
+  function upsertMedicalResults(req, res, next) {
     const { testId } = req.params;
     const testResultsData = req.body;
 
-    Controller.uspertMedicalResultsData(testId, testResultsData)
+    Controller.upsertMedicalResultsData(testId, testResultsData)
       .then((user) => {
         response.success(req, res, user, 200);
       })

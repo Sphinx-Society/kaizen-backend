@@ -265,7 +265,7 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
-  async function uspertMedicalResultsData(testsId, testResultsData) {
+  async function upsertMedicalResultsData(testsId, testResultsData) {
     try {
       if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
 
@@ -303,6 +303,6 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUserTest,
     uploadImage,
     updateMedicalTest,
-    uspertMedicalResultsData,
+    upsertMedicalResultsData,
   };
 };
