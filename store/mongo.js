@@ -145,12 +145,12 @@ class MongoLib {
    * @returns Object
    * @memberof MongoLib
    */
-  update(collection, filter, setData, pushData = '') {
+  update(collection, filter, setData = null, pushData = null) {
 
     let query = {};
 
-    query = setData !== (undefined || null || '') ? { ...query, $set: setData } : { ...query };
-    query = pushData !== (undefined || null || '') ? { ...query, $push: pushData } : { ...query };
+    query = setData !== null || '' ? { ...query, $set: setData } : { ...query };
+    query = pushData !== null || '' ? { ...query, $push: pushData } : { ...query };
 
     return this.connect().then((db) => {
       return db.collection(collection).updateOne(filter, query, { upsert: false });
@@ -179,6 +179,22 @@ class MongoLib {
         deletedId: result.deletedCount > 0 ? id : 0,
         deletedCount: result.deletedCount,
       }))
+      .catch((error) => this.errorMsgHandler(error));
+  }
+
+  /**
+   * Method that calculates aggregate values for the data in a collection.
+   *
+   * @param String collection
+   * @param Array operation
+   * @returns Object
+   * @memberof MongoLib
+   */
+  aggregate(collection, pipeline) {
+    return this.connect()
+      .then((db) => {
+        return db.collection(collection).aggregate(pipeline).toArray();
+      })
       .catch((error) => this.errorMsgHandler(error));
   }
 

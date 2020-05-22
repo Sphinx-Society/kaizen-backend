@@ -649,47 +649,34 @@ describe('Testing the POST [user/tests] endpoint', () => {
 });
 
 describe('Testing the GET [user/tests] endpoint', () => {
-  it('Should test the get user/tests endpoint and return a success message', async (done) => {
+  it('Should test the get user/tests endpoint with done status and return a success message', async (done) => {
 
-    const userId = '111111111111111111111111';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests`);
-
-    expect(response.error).toBe(false);
-    expect(response.status).toBe(200);
-    expect(response.body.message).toBe('User doesn\'t exists');
-
-    await app.close();
-    await done();
-
-  });
-
-  it('Should test the get user/tests endpoint with "PENDING" filter and return a success message', async (done) => {
-
-    const userId = '111111111111111111111111';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=P`);
-
-    expect(response.error).toBe(false);
-    expect(response.status).toBe(200);
-    expect(response.body.message).toBe('User doesn\'t exists');
-
-    await app.close();
-    await done();
-
-  });
-
-  it('Should test the get user/tests endpoint with "DONE" filter and return a success message', async (done) => {
-
-    const userId = '111111111111111111111111';
+    const userId = '5ec5f50ea76d8d1b91de94e5';
     const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=D`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
-    expect(response.body.message).toBe('User doesn\'t exists');
+    expect(response.body.message).toHaveProperty(['tests', 0, 'status'], 'DONE' || {});
 
     await app.close();
     await done();
 
   });
+
+  it('Should test the get user/tests endpoint with pending status and return a success message', async (done) => {
+
+    const userId = '5ec5f50ea76d8d1b91de94e5';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=P`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty(['tests', 0, 'status'], 'PENDING' || {});
+
+    await app.close();
+    await done();
+
+  });
+
 });
 
 describe('Testing the GET [user/test] endpoint', () => {
@@ -751,7 +738,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
       'testName': 'Análisis Sanguineo',
       'doctorName': 'José Francisco',
       'doctorId': '5e30b94546fc3f5c223c4254',
-      'status': 'DONE',
+      'status': 'PENDING',
     };
 
     const response = await supertest(app)
@@ -762,7 +749,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toHaveProperty('matchedCount');
     expect(response.body.message.matchedCount).toBe(1);
-    expect(response.body.message).toHaveProperty('modifiedCount');
+    expect(response.body.message).toHaveProperty('updatedCount');
     expect(response.body.message.updatedCount).toBe(1);
 
     await app.close();
@@ -789,7 +776,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
     expect(response.status).toBe(200);
     expect(response.body.message).toHaveProperty('matchedCount');
     expect(response.body.message.matchedCount).toBe(0);
-    expect(response.body.message).toHaveProperty('modifiedCount');
+    expect(response.body.message).toHaveProperty('updatedCount');
     expect(response.body.message.updatedCount).toBe(0);
 
     await app.close();

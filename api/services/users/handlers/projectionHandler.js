@@ -1,16 +1,48 @@
+const isEmpty = require('../../../../utils/helpers/objectEmpty');
+
 /**
  * Function that build a projection query depending on the type of property and filter.
  *
- * @param {*} property
- * @param {*} filter
- * @returns Object
+ * @param Object property
+ * @param Object filter
+ * @returns Object projection
  */
-function projectionHandler(property, filter) {
+function projectionHandler(property, filter = {}) {
 
-  const projection = {};
+  let projection = {};
 
-  if (property === 'tests' && filter.status !== undefined) {
-    projection[property] = { $elemMatch: { 'status': filter.status === 'P' ? 'PENDING' : 'DONE' } };
+  if (property === 'tests') {
+
+    let condition = {};
+    if (isEmpty(filter)) {
+      condition = { $or: [{ $eq: ['$$tests.status', 'PENDING'] }, { $eq: ['$$tests.status', 'DONE'] }] };
+    } else if (filter.status.toUpperCase() === 'P') {
+      condition = {
+        '$eq': [
+          '$$tests.status', 'PENDING',
+        ],
+      };
+    } else if (filter.status.toUpperCase() === 'D') {
+      condition = {
+        '$eq': [
+          '$$tests.status', 'DONE',
+        ],
+      };
+    }
+
+    projection = {
+      '$project': {
+        '_id': 0,
+        'tests': {
+          '$filter': {
+            'input': '$tests',
+            'as': 'tests',
+            'cond': condition,
+          },
+        },
+      },
+    };
+
   } else if (property === 'test' && filter.testId !== undefined) {
     projection[property] = { $elemMatch: { 'testId': filter.testId } };
   } else {
