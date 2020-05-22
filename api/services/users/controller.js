@@ -50,7 +50,10 @@ module.exports = function (InjectedStore, TABLE) {
       }
       const userInserted = await store.insert(TABLE, createdUser);
 
-      const mailId = await sendWelcomeEmailHandler({ email, credentials });
+      const mailId = await sendWelcomeEmailHandler({
+        email,
+        credentials,
+      });
 
       if (!mailId) {
         throw new Error('Email couldn\'t sent');
@@ -125,12 +128,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Function that receives the userId and delete its user.
- *
- * @param {*} userId
- *
- * @returns {Promise<{ deletedId: String, deletedCount: number }>}
- */
+   * Function that receives the userId and delete its user.
+   *
+   * @param {*} userId
+   *
+   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+   */
   async function deleteUser(userId) {
 
     try {
@@ -164,18 +167,21 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Function that receives the userId and delete its user.
- *
- * @param {*} userId
- *
- * @returns {Promise<{ deletedId: String, deletedCount: number }>}
- */
+   * Function that receives the userId and delete its user.
+   *
+   * @param {*} userId
+   *
+   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+   */
   async function deleteUserTest(userTestId) {
 
     try {
 
       const updatedAt = Date.now();
-      const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId }, { 'tests.$.status': 'INACTIVE', updatedAt });
+      const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId }, {
+        'tests.$.status': 'INACTIVE',
+        updatedAt,
+      });
       return deletedCount;
     } catch (error) {
       throw new Error(error);
@@ -183,11 +189,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Validate if user is successfully logged.
- *
- * @param user
- * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
- */
+   * Validate if user is successfully logged.
+   *
+   * @param user
+   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
+   */
   async function loginUser(user) {
     if (!user) {
       throw new Error('User is required');
@@ -259,6 +265,19 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  async function uspertMedicalResultsData(testsId, testResultsData) {
+    try {
+      if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
+
+      if (!Object.entries(testResultsData)[0].includes('results')) throw new Error('Object to update must contain results key');
+
+      const updateResults = prefixHandler('tests', testResultsData);
+      return await store.update(TABLE, { 'tests.testId': testsId }, updateResults);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   /**
  * Get a buffer file a send to S3 bucket, and return data image from S3
  *
@@ -284,5 +303,6 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUserTest,
     uploadImage,
     updateMedicalTest,
+    uspertMedicalResultsData,
   };
 };
