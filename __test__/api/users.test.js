@@ -891,3 +891,70 @@ describe('Testing the PUT [user/results] endpoint', () => {
     await done();
   });
 });
+
+describe('Testing the GET [user/test/results] endpoint', () => {
+  it('Should test the get user/test/results endpoint and return a success message', async (done) => {
+
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toHaveProperty('results');
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user/test/results endpoint with an incorrect testId and return a warning message', async (done) => {
+
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'SqjEUEqZyh0BJbrP6H1m';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe(`\"testId\" with value \"${testId}\" fails to match the required pattern: /^[0-9a-zA-Z_/-]{21}$/`);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user/test/results endpoint with an incorrect userId and return a warning message', async (done) => {
+
+    const userId = '5ec1c0336ac96a15145fe89';
+    const testId = 'SqjEUEqZyh0BJbrP6H1mX';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe(`\"userId\" with value \"${userId}\" fails to match the required pattern: /^[0-9a-fA-F]{24}$/`);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get user/test/results endpoint without results and return null', async (done) => {
+
+    const userId = '111111111111111111111111';
+    const testId = 'SqjEUEqZyh0BJbrP6H1mX';
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe(null);
+
+    await app.close();
+    await done();
+
+    afterAll = () => {
+      store.connect.close();
+    };
+
+  });
+
+});

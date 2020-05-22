@@ -37,9 +37,9 @@ const Router = (validation) => {
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
   router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
   router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
-
   router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
+  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
   router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
 
   function insertUser(req, res, next) {
@@ -141,7 +141,7 @@ const Router = (validation) => {
 
     const { userId } = req.params;
 
-    Controller.getUserProperty(userId, 'test', req.params)
+    Controller.getUserProperty(userId, 'tests', req.params)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -185,6 +185,16 @@ const Router = (validation) => {
     Controller.uploadImage(req.file, req.body.username)
       .then((data) => {
         response.success(req, res, data, 200);
+      })
+      .catch(next);
+  }
+
+  function getMedicalResults(req, res, next) {
+    const { userId, testId } = req.params;
+
+    Controller.getTestResults(userId, testId)
+      .then((user) => {
+        response.success(req, res, user, 200);
       })
       .catch(next);
   }
