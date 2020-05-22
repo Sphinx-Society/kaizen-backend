@@ -120,6 +120,7 @@ module.exports = function (InjectedStore, TABLE) {
     try {
       const id = objectIdHandler(userId);
       const updateUser = updateObjectHandler(userData);
+
       const updatedCount = await store.update(TABLE, id, updateUser);
       return updatedCount;
     } catch (error) {
@@ -235,14 +236,34 @@ module.exports = function (InjectedStore, TABLE) {
     try {
 
       const id = objectIdHandler(userId);
-
       const queryProjection = projectionHandler(property, filter);
-
       const operation = [{ $match: id }, { ...queryProjection }];
 
       const [result] = await store.aggregate(TABLE, operation);
-
       return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+   * Function that retrieves the results of an specific user medical test
+   *
+   * @param {String} userId
+   * @param {String} testId
+   * @returns {Object} results
+   */
+  async function getTestResults(userId, testId) {
+
+    try {
+      const id = objectIdHandler(userId);
+      const queryProjection = projectionHandler('results', { id, testId });
+
+      const [result] = await store.aggregate(TABLE, queryProjection);
+
+      if (!result) return null;
+
+      return result._id;
     } catch (error) {
       throw new Error(error);
     }
@@ -303,6 +324,7 @@ module.exports = function (InjectedStore, TABLE) {
     deleteUserTest,
     uploadImage,
     updateMedicalTest,
+    getTestResults,
     upsertMedicalResultsData,
   };
 };
