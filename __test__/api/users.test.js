@@ -29,6 +29,12 @@ const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLogi
 
 const store = new MongoLib();
 
+afterAll = async (done) => {
+  await app.close();
+  await done();
+  await store.client.close();
+};
+
 describe('Testing the GET [base] API route', () => {
 
   it('Should test the API base route against its content and status', async (done) => {
@@ -456,6 +462,31 @@ describe('Testing the PUT [user] endpoint', () => {
 });
 
 describe('Testing the DELETE [user] endpoint', () => {
+  it('Should test the delete users endpoint deleting a userId and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.matchedCount).toBe(1);
+    expect(deletedResponse.body.message.updatedCount).toBe(1);
+
+    const userDeleted = await store.delete('users', response.body.message.insertedId);
+
+    expect(userDeleted.deletedId).toHaveLength(24);
+    expect(userDeleted.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
   it('Should test the delete users endpoint deleting an non-existent userId and return a success message', async (done) => {
 
     const userId = '111111111111111111111111';
@@ -975,3 +1006,4 @@ describe('Testing the GET [user/test/results] endpoint', () => {
   });
 
 });
+
