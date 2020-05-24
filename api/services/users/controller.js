@@ -7,7 +7,7 @@ const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('./handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
 const projectionHandler = require('./handlers/projectionHandler');
-const objectIdHandler = require('./handlers/objectIdHandler');
+const objectIdHandler = require('../shared/handlers/objectIdHandler');
 const prefixHandler = require('./handlers/prefixHandler');
 const AWS = require('../../../lib/AWS');
 
