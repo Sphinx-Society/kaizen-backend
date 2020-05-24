@@ -72,7 +72,8 @@ class MongoLib {
   /**
    * Method that retrieve a document of the collection by uid
    * @param {String} collection Name of the collection
-   * @param {String} id
+   * @param {String} id Object id
+   * @param {{}} projection Object that specifies the values that will return or not the query
    * @returns {Promise<{}>} Object with the results
    * @memberof MongoLib
    */
@@ -106,6 +107,7 @@ class MongoLib {
    * Method that return the number of documents in the collection
    *
    * @param {String} collection Name of the collection
+   * @param {{}} query
    * @returns {Promise<number>}
    * @memberof MongoLib
    */
@@ -120,7 +122,7 @@ class MongoLib {
   /**
    * Method that insert a document in the collection
    * @param {String} collection Name of the collection
-   * @param {{}} data
+   * @param {{}} data Data to be inserted
    * @returns {Promise<{insertedId: number, insertedCount: number}>} Object with the results
    * @memberof MongoLib
    */
@@ -144,6 +146,7 @@ class MongoLib {
    * @param {{}} setData Object with data that need to be replace in document
    * @param {{}} pushData Object with data that need to be add in document
    * @param {{}} pullData Object with data that need to be remove from document
+   * @param {boolean} upsert Flag that allows user to upsert a document
    * @returns {Promise<{matchedCount: number, updatedCount: number}>} Object with the results
    * @memberof MongoLib
    */
@@ -170,7 +173,7 @@ class MongoLib {
   /**
  * Method that delete a document of the collection
  * @param {String} collection Name of the collection
- * @param {String} id
+ * @param {String} id Object id
  * @returns {Promise<{}>}
  * @memberof MongoLib
  */
@@ -189,7 +192,7 @@ class MongoLib {
    * Method that calculates aggregate values for the data in a collection.
    *
    * @param {String} collection Name of the collection
-   * @param Array operation
+   * @param {[]} pipeline Aggregation personalized pipeline
    * @returns {Promise<{}>}
    * @memberof MongoLib
    */
@@ -202,10 +205,10 @@ class MongoLib {
   }
 
   /**
- * This manage the error that will be show
- *
- * @param error
- */
+   * This manage the error that will be show
+   * @param {*} error
+   * @memberof MongoLib
+   */
   errorMsgHandler(error) {
     this._msg = error.errmsg || error;
     throw new Error(this._msg);
