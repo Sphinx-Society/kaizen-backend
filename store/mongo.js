@@ -39,9 +39,10 @@ class MongoLib {
 
   /**
    * Method that list the collection and filtered with a query
-   * @param {*} collection
-   * @param {*} query
-   * @returns Object
+   * @param {String} collection Name of the collection
+   * @param {{}} query
+   * @param {{skip: number, limit: number}} pagination
+   * @returns {Promise <{}>}
    * @memberof MongoLib
    */
   list(collection, query, pagination) {
@@ -56,9 +57,9 @@ class MongoLib {
   /**
    * This function retrieves all data found it by query sent.
    *
-   * @param collection
-   * @param query
-   * @returns {Promise<unknown>}
+   * @param {String} collection Name of the collection
+   * @param {} query
+   * @returns {Promise<[]>}
    */
   search(collection, query) {
     return this.connect()
@@ -70,9 +71,9 @@ class MongoLib {
 
   /**
    * Method that retrieve a document of the collection by uid
-   * @param {*} collection
-   * @param {*} id
-   * @returns Object
+   * @param {String} collection Name of the collection
+   * @param {String} id
+   * @returns {Promise<{}>} Object with the results
    * @memberof MongoLib
    */
   get(collection, id, projection = {}) {
@@ -88,9 +89,9 @@ class MongoLib {
   /**
    * Method that receives a query and return the number of coincidences.
    *
-   * @param {*} collection
-   * @param {*} query
-   * @returns Number
+   * @param {String} collection Name of the collection
+   * @param {{}} query
+   * @returns {Promise<number>}
    * @memberof MongoLib
    */
   findAndCount(collection, query) {
@@ -104,8 +105,8 @@ class MongoLib {
   /**
    * Method that return the number of documents in the collection
    *
-   * @param {*} collection
-   * @returns
+   * @param {String} collection Name of the collection
+   * @returns {Promise<number>}
    * @memberof MongoLib
    */
   countDocuments(collection, query) {
@@ -118,9 +119,9 @@ class MongoLib {
 
   /**
    * Method that insert a document in the collection
-   * @param {*} collection
-   * @param {*} data
-   * @returns Object
+   * @param {String} collection Name of the collection
+   * @param {{}} data
+   * @returns {Promise<{insertedId: number, insertedCount: number}>} Object with the results
    * @memberof MongoLib
    */
   insert(collection, data) {
@@ -138,22 +139,24 @@ class MongoLib {
 
   /**
    * Method that update a document of the collection
-   * @param {*} collection String
-   * @param filter Object
-   * @param setData Object
-   * @param pushData Object
-   * @returns Object
+   * @param {String} collection Name of the collection
+   * @param {{}} filter Object with data that will be used to search the document
+   * @param {{}} setData Object with data that need to be replace in document
+   * @param {{}} pushData Object with data that need to be add in document
+   * @param {{}} pullData Object with data that need to be remove from document
+   * @returns {Promise<{matchedCount: number, updatedCount: number}>} Object with the results
    * @memberof MongoLib
    */
-  update(collection, filter, setData = null, pushData = null) {
+  update(collection, filter, setData = null, pushData = null, pullData = null, upsert = false) {
 
     let query = {};
 
     query = setData !== null || '' ? { ...query, $set: setData } : { ...query };
     query = pushData !== null || '' ? { ...query, $push: pushData } : { ...query };
+    query = pullData !== null || '' ? { ...query, $pull: pullData } : { ...query };
 
     return this.connect().then((db) => {
-      return db.collection(collection).updateOne(filter, query, { upsert: false });
+      return db.collection(collection).updateOne(filter, query, { upsert });
     })
       .then((result) => {
         return {
@@ -166,9 +169,9 @@ class MongoLib {
 
   /**
  * Method that delete a document of the collection
- * @param {*} collection
- * @param {*} id
- * @returns Object
+ * @param {String} collection Name of the collection
+ * @param {String} id
+ * @returns {Promise<{}>}
  * @memberof MongoLib
  */
   delete(collection, id) {
@@ -185,9 +188,9 @@ class MongoLib {
   /**
    * Method that calculates aggregate values for the data in a collection.
    *
-   * @param String collection
+   * @param {String} collection Name of the collection
    * @param Array operation
-   * @returns Object
+   * @returns {Promise<{}>}
    * @memberof MongoLib
    */
   aggregate(collection, pipeline) {

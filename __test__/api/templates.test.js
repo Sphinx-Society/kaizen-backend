@@ -36,6 +36,20 @@ describe('Testing the POST [templates] endpoint', () => {
     await done();
   });
 
+  it('Should test the post templates endpoint with a duplicated name and return a success message', async (done) => {
+
+    const responseDuplicated = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
+    expect(responseDuplicated.error).toBe(false);
+    expect(responseDuplicated.status).toBe(201);
+    expect(responseDuplicated.body.message).toBe('Template already exists');
+
+    await store.update('catalogs', {}, null, null, { 'medicalTests': createTemplateSuccess.name });
+
+    await app.close();
+    await done();
+  });
+
   it('Should test the post templates endpoint with a template name error and return an error message', async (done) => {
 
     const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateNameError);

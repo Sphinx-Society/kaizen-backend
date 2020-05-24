@@ -1,5 +1,5 @@
 const createTemplateSuccess = {
-  'name': 'GLUCOSA EN SANGRE',
+  'name': '5ec9fb04330b3b30157c31daS',
   'type': 'EXAMEN DE LABORATORIO',
   'createdBy': 'arantxa.rosas.1234',
   'fields': [

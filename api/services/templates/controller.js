@@ -18,6 +18,11 @@ module.exports = function (InjectedStore, TABLE) {
 
     try {
 
+      const templateNameExists = await store.findAndCount('catalogs', { 'medicalTests': template.name });
+
+      if (templateNameExists >= 1) {
+        return 'Template already exists';
+      }
       const insertedAt = Date.now();
       const active = true;
 
@@ -29,7 +34,13 @@ module.exports = function (InjectedStore, TABLE) {
 
       const templateInserted = await store.insert(TABLE, createdTemplate);
 
-      return templateInserted;
+      if (templateInserted) {
+        const catalogInserted = await store.update('catalogs', {}, null, { 'medicalTests': template.name }, null, true);
+        if (catalogInserted) {
+          return templateInserted;
+        }
+      }
+      return { 'insertedCount': 0 };
 
     } catch (error) {
       throw new Error(error);
