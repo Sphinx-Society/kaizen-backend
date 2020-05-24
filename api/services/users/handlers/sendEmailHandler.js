@@ -21,7 +21,7 @@ async function sendWelcomeEmailHandler(content) {
       text: messageText,
     };
 
-    const mailId = await Mailer(message);
+    const mailId = sendEmailHandler(message);
 
     return mailId;
   } catch (error) {
@@ -43,6 +43,17 @@ async function sendRestPasswordEmailHandler(content) {
       subject: 'Kaizen - nueva contraseña',
       text: messageText,
     };
+
+    const mailId = sendEmailHandler(message);
+
+    return mailId;
+  } catch (error) {
+    throw new Error(error);
+  }
+}
+
+async function sendEmailHandler(message) {
+  try {
 
     const mailId = await Mailer(message);
 
