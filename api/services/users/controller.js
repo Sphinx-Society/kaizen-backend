@@ -1,6 +1,6 @@
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
-const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
+const { sendWelcomeEmailHandler, sendRestPasswordEmailHandler } = require('./handlers/sendEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
@@ -9,6 +9,7 @@ const createUserTestHandler = require('./handlers/createUserTestHandler');
 const projectionHandler = require('./handlers/projectionHandler');
 const objectIdHandler = require('../shared/handlers/objectIdHandler');
 const prefixHandler = require('./handlers/prefixHandler');
+const createPasswordHandler = require('./handlers/createPasswordHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -150,12 +151,73 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that add a medical test to user
+   * Validate if user is successfully logged.
    *
-   * @param {*} userId
-   * @param {*} userData
-   * @returns Promise<{ tests: Object; }>
+   * @param user
+   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
    */
+  async function loginUser(user) {
+    if (!user) {
+      throw new Error('User is required');
+    }
+    return loginUserHandler(user, store, TABLE);
+  }
+
+  /**
+   * Function that generates a new password for the user and send it a new one by email
+   *
+   * @param {String} userId
+   * @returns {{}} Object reset password results
+   */
+  async function resetPassword(userId) {
+
+    try {
+      const result = await store.get(TABLE, userId, { 'auth.email': 1, 'auth.username': 1, '_id': 0 });
+
+      if (!result) {
+        throw new Error('Invalid User');
+      }
+
+      const { email, username } = result.auth;
+
+      let passwords = await createPasswordHandler();
+
+      let { password, hashedPassword } = passwords;
+      let credentials = { username, password };
+      const updatedAt = Date.now();
+
+      const id = objectIdHandler(userId);
+      const updatedPassword = await store.update(TABLE, id, { 'auth.password': hashedPassword, updatedAt });
+
+      if (updatedPassword.updatedCount === 0) {
+        return updatedPassword;
+      }
+
+      const mailId = await sendRestPasswordEmailHandler({ email, credentials });
+
+      if (!mailId) {
+        throw new Error('Email couldn\'t sent');
+      }
+
+      hashedPassword = '';
+      password = '';
+      credentials = {};
+      passwords = {};
+
+      return updatedPassword;
+
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+* Function that add a medical test to user
+*
+* @param {*} userId
+* @param {*} userData
+* @returns Promise<{ tests: Object; }>
+*/
   async function addTestToUser(userId, userData) {
 
     try {
@@ -172,12 +234,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that deletes the user test by its id, as long as the test doesn't have results.
-   *
-   * @param {String} userTestId
-   *
-   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
-   */
+* Function that deletes the user test by its id, as long as the test doesn't have results.
+*
+* @param {String} userTestId
+*
+* @returns {Promise<{ deletedId: String, deletedCount: number }>}
+*/
   async function deleteUserTest(userTestId) {
 
     try {
@@ -202,24 +264,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Validate if user is successfully logged.
-   *
-   * @param user
-   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
-   */
-  async function loginUser(user) {
-    if (!user) {
-      throw new Error('User is required');
-    }
-    return loginUserHandler(user, store, TABLE);
-  }
-
-  /**
-   * Function that receives the userId and a property and returns property object of the userId.
-   *
-   * @param {*} userId
-   * @returns {Promise<{ user: {profile: {}}}>}
-   */
+* Function that receives the userId and a property and returns property object of the userId.
+*
+* @param {*} userId
+* @returns {Promise<{ user: {profile: {}}}>}
+*/
   async function getUserProperty(userId, property, filter) {
 
     try {
@@ -237,13 +286,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
-   *
-   * @param {*} userId
-   * @param {*} property
-   * @param {*} filter
-   * @returns
-   */
+* Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
+*
+* @param {*} userId
+* @param {*} property
+* @param {*} filter
+* @returns
+*/
   async function getTests(userId, property, filter) {
     try {
 
@@ -260,12 +309,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that retrieves the results of an specific user medical test
-   *
-   * @param {String} userId
-   * @param {String} testId
-   * @returns {Object} results
-   */
+* Function that retrieves the results of an specific user medical test
+*
+* @param {String} userId
+* @param {String} testId
+* @returns {Object} results
+*/
   async function getTestResults(userId, testId) {
 
     try {
@@ -283,13 +332,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Make a request to MongoDB in order to update a medical test info, if data was be updated,
- * the response have a property updatedCount with value 1 otherwise «zero»
- *
- * @param {String} testsId
- * @param {Object}testData
- * @return {Promise<*>}
- */
+* Make a request to MongoDB in order to update a medical test info, if data was be updated,
+* the response have a property updatedCount with value 1 otherwise «zero»
+*
+* @param testsId
+* @param testData
+* @return {Promise<*>}
+*/
   async function updateMedicalTest(testsId, testData) {
     try {
       const updateUser = prefixHandler('tests', testData);
@@ -319,12 +368,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Get a buffer file a send to S3 bucket, and return data image from S3
- *
- * @param file
- * @param username
- * @returns {Promise<void>}
- */
+* Get a buffer file a send to S3 bucket, and return data image from S3
+*
+* @param file
+* @param username
+* @returns {Promise<void>}
+*/
   async function uploadImage(file, username) {
     const aws = new AWS();
     return aws.uploadFile(file, username);
@@ -337,6 +386,7 @@ module.exports = function (InjectedStore, TABLE) {
     updateUser,
     deleteUser,
     loginUser,
+    resetPassword,
     getUserProperty,
     getTests,
     addTestToUser,
