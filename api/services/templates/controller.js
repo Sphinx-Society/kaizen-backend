@@ -23,13 +23,11 @@ module.exports = function (InjectedStore, TABLE) {
       if (templateNameExists >= 1) {
         return 'Template already exists';
       }
-      const insertedAt = Date.now();
-      const active = true;
 
       createdTemplate = {
         ...template,
-        active,
-        insertedAt,
+        active: true,
+        insertedAt: Date.now(),
       };
 
       const templateInserted = await store.insert(TABLE, createdTemplate);
