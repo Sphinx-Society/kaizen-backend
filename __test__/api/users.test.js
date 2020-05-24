@@ -79,11 +79,6 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    /* const deletedResponse = await store.delete('users', response.body.message.insertedId);
-
-    expect(deletedResponse.deletedId).toHaveLength(24);
-    expect(deletedResponse.deletedCount).toBe(1);
- */
     await app.close();
     await done();
 
@@ -227,11 +222,6 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    /* const deletedResponse = await store.delete('users', response.body.message.insertedId);
-
-    expect(deletedResponse.deletedId).toHaveLength(24);
-    expect(deletedResponse.deletedCount).toBe(1);
- */
     await app.close();
     await done();
 
