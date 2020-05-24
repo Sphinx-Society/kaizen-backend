@@ -41,6 +41,10 @@ app.use(wrapErrors);
 app.use(logErrors);
 app.use(errorMiddleware);
 
+if (config.server.env === 'testing') {
+  config.server.port = Math.abs(parseInt((Math.random() * (3000 - 9000) - 3000), 10));
+}
+
 const server = app.listen(config.server.port, () => {
   console.log(`Server is listening at ${config.server.host}:${server.address().port}`);
 });
