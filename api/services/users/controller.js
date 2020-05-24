@@ -138,7 +138,11 @@ module.exports = function (InjectedStore, TABLE) {
   async function deleteUser(userId) {
 
     try {
-      const deletedCount = await store.delete(TABLE, userId);
+      const updatedAt = Date.now();
+      const id = objectIdHandler(userId);
+      // const deletedCount = await store.delete(TABLE, userId);
+      const deletedCount = await store.update(TABLE, id,
+        { 'auth.active': false, updatedAt });
       return deletedCount;
     } catch (error) {
       throw new Error(error);
