@@ -1,4 +1,4 @@
-const generator = require('generate-password');
+const createPasswordHandler = require('./createPasswordHandler');
 const Store = require('../../../../store/mongo');
 
 const store = new Store();
@@ -55,21 +55,16 @@ async function createCredentialsHandler(user) {
 
     const username = await generateUser(firstName, lastName, documentId);
 
-    const password = generator.generate({
-      length: 10,
-      numbers: true,
-      uppercase: true,
-      lowercase: true,
-      strict: true,
-      excludeSimilarCharacters: true,
-    });
+    const passwords = await createPasswordHandler();
+
+    const { password } = passwords;
 
     const userCredentials = { username, password };
 
     return userCredentials;
 
   } catch (error) {
-    return error;
+    throw new Error(error);
   }
 }
 

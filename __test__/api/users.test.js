@@ -79,11 +79,6 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const deletedResponse = await store.delete('users', response.body.message.insertedId);
-
-    expect(deletedResponse.deletedId).toHaveLength(24);
-    expect(deletedResponse.deletedCount).toBe(1);
-
     await app.close();
     await done();
 
@@ -212,6 +207,20 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
     expect(response.body.message).toBe('\"Role\" must be one of [patient, doctor, lab, admin]');
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the post users endpoint with a duplicated document id and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
 
     await app.close();
     await done();
@@ -379,6 +388,34 @@ describe('Testing the POST [login] endpoint', () => {
     await app.close();
     await done();
   });
+});
+
+describe('Testing the POST [resetPassword] endpoint', () => {
+  it('Should test the resetPassword endpoint with an inexistent user and return error', async (done) => {
+    const userId = '5eb8c73377d75e0b8a77d9b0';
+    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.body.message).toBe('Error: Invalid User');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the resetPassword endpoint with a valid user and return success', async (done) => {
+
+    const userId = '5eb8c73377d75e0b8a77d9b4';
+    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`);
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+    expect(response.body.message).toHaveProperty('matchedCount');
+    expect(response.body.message.matchedCount).toBe(1);
+    expect(response.body.message).toHaveProperty('updatedCount');
+    expect(response.body.message.updatedCount).toBe(1);
+    await app.close();
+    await done();
+  });
+
 });
 
 describe('Testing the PUT [user] endpoint', () => {
