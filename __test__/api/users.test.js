@@ -795,13 +795,13 @@ describe('Testing the PUT [user/results] endpoint', () => {
   it('Should test the update user/test/results endpoint and return a success message', async (done) => {
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
-
+    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING', 'CORRUPTED', 'INDETERMINATE'];
+    const val = () => values[Math.floor(Math.random() * values.length)];
     const payload = {
       'results': {
-        'COVID-19': values[Math.floor(Math.random() * values.length)],
-        'SARS': values[Math.floor(Math.random() * values.length)],
-        'MERS': values[Math.floor(Math.random() * values.length)],
+        'COVID-19': val(),
+        'SARS': val(),
+        'MERS': val(),
       },
     };
 
