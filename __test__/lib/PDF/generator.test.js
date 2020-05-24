@@ -10,13 +10,9 @@ describe('Testing to generate pdf', () => {
       text: 'This a test message',
     };
 
-    try {
-      await generateDocument(data, path);
-      const file = await fs.existsSync(path);
-      expect(file).toBe(true);
-    } catch (err) {
-      console.error(err);
-    }
+    generateDocument(data, path);
+    const file = await fs.existsSync(path);
+    expect(file).toBe(true);
     done();
   }, 3000);
 });

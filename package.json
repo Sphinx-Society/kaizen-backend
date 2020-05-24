@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-    "test": "jest"
+    "test": "env ENV=testing jest",
+    "coverage": "env ENV=testing jest --coverage"
   },
   "repository": {
     "type": "git",
