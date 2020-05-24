@@ -73,12 +73,10 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -231,7 +229,7 @@ describe('Testing the GET [users] endpoint', () => {
 
   it('Should test the get users endpoint with documentId parameter existing in DB and return a success message', async (done) => {
 
-    const documentId = '1234567890';
+    const documentId = '12345678909';
     const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
 
     expect(response.status).toBe(200);
@@ -394,12 +392,10 @@ describe('Testing the PUT [user] endpoint', () => {
     expect(updatedResponse.body.message.matchedCount).toBe(1);
     expect(updatedResponse.body.message.updatedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -467,8 +463,8 @@ describe('Testing the DELETE [user] endpoint', () => {
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toBe(0);
-    expect(deletedResponse.body.message.deletedCount).toBe(0);
+    expect(deletedResponse.body.message.matchedCount).toBe(0);
+    expect(deletedResponse.body.message.updatedCount).toBe(0);
 
     await app.close();
     await done();
@@ -493,12 +489,10 @@ describe('Testing the GET [user/profile] endpoint', () => {
     //expect(getResponse.body.message._id).toHaveLength(24);
     expect(getResponse.body.message).toHaveProperty('profile');
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -523,13 +517,10 @@ describe('Testing the PUT [user/profile] endpoint', () => {
     expect(updatedResponse.body.message.matchedCount).toBe(1);
     expect(updatedResponse.body.message.updatedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
-
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
     await app.close();
     await done();
   });
@@ -606,12 +597,10 @@ describe('Testing the POST [user/tests] endpoint', () => {
     expect(updatedResponse.body.message.matchedCount).toBe(1);
     expect(updatedResponse.body.message.updatedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -639,12 +628,10 @@ describe('Testing the POST [user/tests] endpoint', () => {
     expect(createSameTestResponse.status).toBe(400);
     expect(createSameTestResponse.body.message).toBe('Error: A pending medical test already exists in user');
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message.deletedId).toHaveLength(24);
-    expect(deletedResponse.body.message.deletedCount).toBe(1);
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -750,6 +737,7 @@ describe('Testing the DELETE [user/test] endpoint', () => {
 
     const userId = '111111111111111111111111';
     const testId = 'U1wBq5pfs-3IX4EfMZomh';
+
     const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
 
     expect(deletedResponse.error).toBe(false);
