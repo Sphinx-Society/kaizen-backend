@@ -47,34 +47,16 @@ const Router = (validation) => {
    */
   router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
-  router.get('/:userId/tests/:testId', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), getUserTest);
-  router.put('/:userId/tests/:testId', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), updateMedicalTest);
-  router.delete('/:userId/tests/:testId', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), deleteUserTest);
+  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
+  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
+  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
   /**
-   * Resutlts medical tests Routes
+   * Results medical tests Routes
    */
-  router.get('/:userId/tests/:testId/results', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), getMedicalResults);
-  router.get('/:userId/tests/:testId/results/document', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), getResultsPdf);
-  router.put('/:userId/tests/:testId/results', validation({
-    userId: userIdSchema,
-    testId: testIdSchema,
-  }, 'params'), upsertMedicalResults);
+  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
+  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
+  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
 
   function insertUser(req, res, next) {
 

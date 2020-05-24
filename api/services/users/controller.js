@@ -1,4 +1,3 @@
-const fs = require('fs');
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
@@ -249,7 +248,7 @@ module.exports = function (InjectedStore, TABLE) {
       const operation = [{ $match: id }, { ...queryProjection }];
 
       const [result] = await store.aggregate(TABLE, operation);
-      console.log(result);
+
       return result;
     } catch (error) {
       throw new Error(error);
