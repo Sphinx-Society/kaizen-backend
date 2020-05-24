@@ -168,9 +168,9 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and delete its user.
+   * Function that deletes the user test by its id, as long as the test doesn't have results.
    *
-   * @param {*} userId
+   * @param {String} userTestId
    *
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
@@ -179,11 +179,19 @@ module.exports = function (InjectedStore, TABLE) {
     try {
 
       const updatedAt = Date.now();
+
+      const existsResults = await store.findAndCount(TABLE, { 'tests': { $elemMatch: { 'testId': userTestId, 'results': { $exists: true } } } });
+
+      if (existsResults >= 1) {
+        return 'Cannot delete because it has results';
+      }
       const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId }, {
         'tests.$.status': 'INACTIVE',
         updatedAt,
       });
+
       return deletedCount;
+
     } catch (error) {
       throw new Error(error);
     }

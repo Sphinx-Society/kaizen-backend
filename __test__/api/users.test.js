@@ -719,6 +719,35 @@ describe('Testing the DELETE [user/test] endpoint', () => {
 
   it('Should test the delete test endpoint and return a success message', async (done) => {
 
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message).toBe('Cannot delete because it has results');
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the delete test endpoint and return a success message', async (done) => {
+
+    const userId = '5ec1c0336ac96a15145fe896';
+    const testId = '000000000000000000003';
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.matchedCount).toBe(1);
+    expect(deletedResponse.body.message.updatedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the delete test endpoint with and inexistent user and return a success message', async (done) => {
+
     const userId = '111111111111111111111111';
     const testId = 'U1wBq5pfs-3IX4EfMZomh';
     const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
@@ -952,7 +981,7 @@ describe('Testing the GET [user/test/results] endpoint', () => {
     await done();
 
     afterAll = () => {
-      store.connect.close();
+      store.client.close();
     };
 
   });
