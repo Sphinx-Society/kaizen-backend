@@ -1,4 +1,6 @@
 const express = require('express');
+const pdf = require('html-pdf');
+const generatorDocument = require('../../../lib/PDF/generator');
 const response = require('../../../network/response');
 const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
@@ -21,26 +23,58 @@ const router = express.Router();
  */
 const Router = (validation) => {
 
+  /**
+   * User Routes
+   */
   router.post('/', validation(createUserSchema), insertUser);
+  router.post('/login', loginUser);
   router.get('/', validation(listUsersSchema, 'query'), listUsers);
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
   router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
   router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+
+  // TODO refactor next
   router.post('/upload', jwtAuthMiddleware, uploadImages);
 
-  router.post('/login', loginUser);
-
+  /**
+   * Profile Roustes
+   */
   router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), getUserProfile);
   router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
 
+  /**
+   * Medical test Routes
+   */
   router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
   router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
-  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
-  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
-  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
+  router.get('/:userId/tests/:testId', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), getUserTest);
+  router.put('/:userId/tests/:testId', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), updateMedicalTest);
+  router.delete('/:userId/tests/:testId', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), deleteUserTest);
 
-  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
-  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+  /**
+   * Resutlts medical tests Routes
+   */
+  router.get('/:userId/tests/:testId/results', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), getMedicalResults);
+  router.get('/:userId/tests/:testId/results/document', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), getResultsPdf);
+  router.put('/:userId/tests/:testId/results', validation({
+    userId: userIdSchema,
+    testId: testIdSchema,
+  }, 'params'), upsertMedicalResults);
 
   function insertUser(req, res, next) {
 
@@ -206,6 +240,22 @@ const Router = (validation) => {
     Controller.upsertMedicalResultsData(testId, testResultsData)
       .then((user) => {
         response.success(req, res, user, 200);
+      })
+      .catch(next);
+  }
+
+  function getResultsPdf(req, res, next) {
+    const { userId } = req.params;
+
+    Controller.getUserProperty(userId, 'tests', req.params)
+      .then(async (user) => {
+        res.set('Content-Type', 'application/pdf');
+        const file = await generatorDocument(user.tests[0]);
+        pdf.create(file).toStream((err, stream) => {
+          if (err) console.log(err);
+          res.set('Content-type', 'application/pdf');
+          stream.pipe(res);
+        });
       })
       .catch(next);
   }

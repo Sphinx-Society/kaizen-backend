@@ -1,3 +1,4 @@
+const fs = require('fs');
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
@@ -248,6 +249,7 @@ module.exports = function (InjectedStore, TABLE) {
       const operation = [{ $match: id }, { ...queryProjection }];
 
       const [result] = await store.aggregate(TABLE, operation);
+      console.log(result);
       return result;
     } catch (error) {
       throw new Error(error);
@@ -281,8 +283,8 @@ module.exports = function (InjectedStore, TABLE) {
  * Make a request to MongoDB in order to update a medical test info, if data was be updated,
  * the response have a property updatedCount with value 1 otherwise «zero»
  *
- * @param testsId
- * @param testData
+ * @param {String} testsId
+ * @param {Object}testData
  * @return {Promise<*>}
  */
   async function updateMedicalTest(testsId, testData) {
@@ -294,6 +296,12 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Update data in MongoDB from test result
+   * @param {String} testsId
+   * @param  {Object} testResultsData
+   * @return {Promise<*>}
+   */
   async function upsertMedicalResultsData(testsId, testResultsData) {
     try {
       if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
