@@ -1,4 +1,5 @@
-
+const objectIdHandler = require('../shared/handlers/objectIdHandler');
+const updateObjectHandler = require('../shared/handlers/updateObjectHandler');
 /**
  * Controller that validate the request information and sends it to the store
  * @param  {} injectedStore
@@ -18,12 +19,6 @@ module.exports = function (InjectedStore, TABLE) {
 
     try {
 
-      const templateNameExists = await store.findAndCount('catalogs', { 'medicalTests': template.name });
-
-      if (templateNameExists >= 1) {
-        return 'Template already exists';
-      }
-
       createdTemplate = {
         ...template,
         active: true,
@@ -31,15 +26,29 @@ module.exports = function (InjectedStore, TABLE) {
       };
 
       const templateInserted = await store.insert(TABLE, createdTemplate);
+      return templateInserted;
 
-      if (templateInserted) {
-        const catalogInserted = await store.update('catalogs', {}, null, { 'medicalTests': template.name }, null, true);
-        if (catalogInserted) {
-          return templateInserted;
-        }
-      }
-      return { 'insertedCount': 0 };
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
 
+  /**
+   * Function that updates a template
+   *
+   * @param {String} templateId
+   * @param {{}} templateData Object with the data to replace
+   * @returns {{"matchedCount": number, "updatedCount": number}} Update count
+   */
+  async function updateTemplate(templateId, templateData) {
+
+    try {
+      const id = objectIdHandler(templateId);
+      const updateTemplate = updateObjectHandler(templateData);
+
+      //TODO Add createdby from jwt
+      const updatedCount = await store.update(TABLE, id, updateTemplate);
+      return updatedCount;
     } catch (error) {
       throw new Error(error);
     }
@@ -47,5 +56,6 @@ module.exports = function (InjectedStore, TABLE) {
 
   return {
     insertTemplate,
+    updateTemplate,
   };
 };
