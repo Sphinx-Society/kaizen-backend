@@ -54,8 +54,22 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  async function deleteTemplate(userId) {
+
+    try {
+      const updatedAt = Date.now();
+      const id = objectIdHandler(userId);
+      const deletedCount = await store.update(TABLE, id,
+        { 'active': false, updatedAt });
+      return deletedCount;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertTemplate,
     updateTemplate,
+    deleteTemplate,
   };
 };
