@@ -48,6 +48,18 @@ module.exports = function (InjectedStore, TABLE) {
       if (!createdUser) {
         throw new Error('Invalid User');
       }
+
+      if (user.profile.avatar && user.profile.avatar !== '') {
+        const aws = new AWS();
+        const upload = await aws.uploadAvatar(user.profile.avatar, createdUser.auth.username, user.profile.avatarMimeType);
+        if (upload) {
+          createdUser.profile.avatar = upload.Location;
+        } else {
+          createdUser.profile.avatar = '';
+        }
+        delete createdUser.profile.avatarMimeType;
+      }
+
       const userInserted = await store.insert(TABLE, createdUser);
 
       const mailId = await sendWelcomeEmailHandler({
@@ -311,18 +323,6 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
-  /**
- * Get a buffer file a send to S3 bucket, and return data image from S3
- *
- * @param file
- * @param username
- * @returns {Promise<void>}
- */
-  async function uploadImage(file, username) {
-    const aws = new AWS();
-    return aws.uploadFile(file, username);
-  }
-
   return {
     insertUser,
     listUsers,
@@ -334,7 +334,6 @@ module.exports = function (InjectedStore, TABLE) {
     getTests,
     addTestToUser,
     deleteUserTest,
-    uploadImage,
     updateMedicalTest,
     getTestResults,
     upsertMedicalResultsData,
