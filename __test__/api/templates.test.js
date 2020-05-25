@@ -240,7 +240,7 @@ describe('Testing the GET [templates/id] endpoint', () => {
     await done();
   });
 
-  it('Should test the get templates by id endpoint and return a error message', async (done) => {
+  it('Should test the get templates by id endpoint and return an error message', async (done) => {
     const templateId = '5ec9fee83c83003';
     const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
 
@@ -252,7 +252,7 @@ describe('Testing the GET [templates/id] endpoint', () => {
     await done();
   });
 
-  it('Should test the get templates by id endpoint and return a ny message', async (done) => {
+  it('Should test the get templates by id endpoint and returns an empty object inside the "message" property', async (done) => {
     const templateId = '5ecb30518904d04999e27ebc';
     const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
 
