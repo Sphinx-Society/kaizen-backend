@@ -13,7 +13,6 @@ const {
   createUserTestSchema,
   testIdSchema,
 } = require('./schema');
-const uploadMiddleware = require('../../../middleware/uploaderMiddleware');
 
 const router = express.Router();
 
@@ -50,10 +49,6 @@ const Router = (validation) => {
   router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
   router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
-
-  // TODO refactor next
-  /* MISCELLANEOUS */
-  router.post('/upload', jwtAuthMiddleware, uploadImages);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
@@ -207,14 +202,6 @@ const Router = (validation) => {
   }
 
   /* MISCELLANEOUS */
-  function uploadImages(req, res, next) {
-    Controller.uploadImage(req.file, req.body.username)
-      .then((data) => {
-        response.success(req, res, data, 200);
-      })
-      .catch(next);
-  }
-
   function getResultsPdf(req, res, next) {
     const { userId } = req.params;
 

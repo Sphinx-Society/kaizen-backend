@@ -49,6 +49,18 @@ module.exports = function (InjectedStore, TABLE) {
       if (!createdUser) {
         throw new Error('Invalid User');
       }
+
+      if (user.profile.avatar && user.profile.avatar !== '') {
+        const aws = new AWS();
+        const upload = await aws.uploadAvatar(user.profile.avatar, createdUser.auth.username, user.profile.avatarMimeType);
+        if (upload) {
+          createdUser.profile.avatar = upload.Location;
+        } else {
+          createdUser.profile.avatar = '';
+        }
+        delete createdUser.profile.avatarMimeType;
+      }
+
       const userInserted = await store.insert(TABLE, createdUser);
 
       const mailId = await sendWelcomeEmailHandler({
@@ -212,12 +224,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Function that add a medical test to user
-*
-* @param {*} userId
-* @param {*} userData
-* @returns Promise<{ tests: Object; }>
-*/
+   * Function that add a medical test to user
+   *
+   * @param {*} userId
+   * @param {*} userData
+   * @returns Promise<{ tests: Object; }>
+   */
   async function addTestToUser(userId, userData) {
 
     try {
@@ -234,12 +246,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Function that deletes the user test by its id, as long as the test doesn't have results.
-*
-* @param {String} userTestId
-*
-* @returns {Promise<{ deletedId: String, deletedCount: number }>}
-*/
+   * Function that deletes the user test by its id, as long as the test doesn't have results.
+   *
+   * @param {String} userTestId
+   *
+   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+   */
   async function deleteUserTest(userTestId) {
 
     try {
@@ -264,11 +276,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Function that receives the userId and a property and returns property object of the userId.
-*
-* @param {*} userId
-* @returns {Promise<{ user: {profile: {}}}>}
-*/
+   * Function that receives the userId and a property and returns property object of the userId.
+   *
+   * @param {*} userId
+   * @returns {Promise<{ user: {profile: {}}}>}
+   */
   async function getUserProperty(userId, property, filter) {
 
     try {
@@ -286,13 +298,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
-*
-* @param {*} userId
-* @param {*} property
-* @param {*} filter
-* @returns
-*/
+   * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
+   *
+   * @param {*} userId
+   * @param {*} property
+   * @param {*} filter
+   * @returns
+   */
   async function getTests(userId, property, filter) {
     try {
 
@@ -309,12 +321,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Function that retrieves the results of an specific user medical test
-*
-* @param {String} userId
-* @param {String} testId
-* @returns {Object} results
-*/
+   * Function that retrieves the results of an specific user medical test
+   *
+   * @param {String} userId
+   * @param {String} testId
+   * @returns {Object} results
+   */
   async function getTestResults(userId, testId) {
 
     try {
@@ -332,13 +344,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-* Make a request to MongoDB in order to update a medical test info, if data was be updated,
-* the response have a property updatedCount with value 1 otherwise «zero»
-*
-* @param testsId
-* @param testData
-* @return {Promise<*>}
-*/
+ * Make a request to MongoDB in order to update a medical test info, if data was be updated,
+ * the response have a property updatedCount with value 1 otherwise «zero»
+ *
+ * @param testsId
+ * @param testData
+ * @return {Promise<*>}
+ */
   async function updateMedicalTest(testsId, testData) {
     try {
       const updateUser = prefixHandler('tests', testData);
@@ -367,18 +379,6 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
-  /**
-* Get a buffer file a send to S3 bucket, and return data image from S3
-*
-* @param file
-* @param username
-* @returns {Promise<void>}
-*/
-  async function uploadImage(file, username) {
-    const aws = new AWS();
-    return aws.uploadFile(file, username);
-  }
-
   return {
     insertUser,
     listUsers,
@@ -391,7 +391,6 @@ module.exports = function (InjectedStore, TABLE) {
     getTests,
     addTestToUser,
     deleteUserTest,
-    uploadImage,
     updateMedicalTest,
     getTestResults,
     upsertMedicalResultsData,

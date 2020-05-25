@@ -20,6 +20,7 @@ const createUserSchema = {
     phoneNumber: Joi.string().label('Phone number').min(13).max(13)
       .required(),
     avatar: Joi.string().label('Profile picture').default('').allow(''),
+    avatarMimeType: Joi.string().label('MimeType from avatar').default('').allow(''),
     gender: Joi.string().max(50).label('Gender').required(),
     country: Joi.string().max(50).label('Country').required(),
     documentId: Joi.string().min(4).label('Document ID').required(),
