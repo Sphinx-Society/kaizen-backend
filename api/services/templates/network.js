@@ -20,6 +20,7 @@ const Router = (validation) => {
   router.post('/', validation(createTemplateSchema), insertTemplate);
   router.get('/:templateId', validation({ templateId: templateIdSchema }, 'params'), getTemplate);
   router.put('/:templateId', validation({ templateId: templateIdSchema }, 'params'), validation(updateTemplateSchema), updateTemplate);
+  router.delete('/:templateId', validation({ templateId: templateIdSchema }, 'params'), deleteTemplate);
 
   function insertTemplate(req, res, next) {
 
@@ -44,6 +45,16 @@ const Router = (validation) => {
   function getTemplate(req, res, next) {
     const { templateId } = req.params;
     Controller.getTemplateById(templateId)
+      .then((template) => {
+        response.success(req, res, template, 200);
+      })
+      .catch(next);
+  }
+
+  function deleteTemplate(req, res, next) {
+
+    const { templateId } = req.params;
+    Controller.deleteTemplate(templateId)
       .then((template) => {
         response.success(req, res, template, 200);
       })

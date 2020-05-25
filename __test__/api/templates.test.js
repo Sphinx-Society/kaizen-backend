@@ -228,6 +228,47 @@ describe('Testing the PUT [templates] endpoint', () => {
   });
 });
 
+describe('Testing the DELETE [templates] endpoint', () => {
+  it('Should test the delete template endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${response.body.message.insertedId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.matchedCount).toBe(1);
+    expect(deletedResponse.body.message.updatedCount).toBe(1);
+
+    const deleteTemplate = await store.delete('templates', response.body.message.insertedId);
+
+    expect(deleteTemplate.deletedId).toHaveLength(24);
+    expect(deleteTemplate.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the delete template endpoint with an inexistent template and return a success message', async (done) => {
+
+    const templateId = '000000000000000000000001';
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${templateId}`);
+
+    expect(deletedResponse.error).toBe(false);
+    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.message.matchedCount).toBe(0);
+    expect(deletedResponse.body.message.updatedCount).toBe(0);
+
+    await app.close();
+    await done();
+  });
+});
+
 describe('Testing the GET [templates/id] endpoint', () => {
   it('Should test the get templates by id endpoint and return a success message', async (done) => {
     const templateId = '5ec9fee83c8300347e2a670f';
