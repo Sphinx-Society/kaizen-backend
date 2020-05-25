@@ -6,6 +6,7 @@ const {
   createTemplateSchema,
   updateTemplateSchema,
   templateIdSchema,
+  listTemplatesSchema,
 } = require('./schema');
 
 const router = express.Router();
@@ -18,6 +19,7 @@ const Router = (validation) => {
 
   /* CRUD OPERATIONS */
   router.post('/', validation(createTemplateSchema), insertTemplate);
+  router.get('/', validation(listTemplatesSchema, 'query'), listTemplates);
   router.put('/:templateId', validation({ templateId: templateIdSchema }, 'params'), validation(updateTemplateSchema), updateTemplate);
   router.delete('/:templateId', validation({ templateId: templateIdSchema }, 'params'), deleteTemplate);
 
@@ -47,6 +49,14 @@ const Router = (validation) => {
     Controller.deleteTemplate(templateId)
       .then((template) => {
         response.success(req, res, template, 200);
+      })
+      .catch(next);
+  }
+
+  function listTemplates(req, res, next) {
+    Controller.listTemplates(req.query)
+      .then((user) => {
+        response.success(req, res, user, 200);
       })
       .catch(next);
   }

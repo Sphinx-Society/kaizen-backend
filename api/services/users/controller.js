@@ -2,7 +2,7 @@ const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const { sendWelcomeEmailHandler, sendRestPasswordEmailHandler } = require('./handlers/sendEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
-const paginationHandler = require('./handlers/paginationHandler');
+const paginationHandler = require('../shared/handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('../shared/handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
@@ -100,6 +100,7 @@ module.exports = function (InjectedStore, TABLE) {
         users,
         totalPages: pagination.totalPages,
         currentPage: parseInt(page, 10),
+        totalDocuments: pagination.totalDocuments,
       });
     } catch (error) {
       throw new Error(error);

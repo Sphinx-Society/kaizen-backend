@@ -41,9 +41,15 @@ const updateTemplateSchema = {
   'fields': Joi.array().items(updateTemplateFieldSchema),
 };
 
+const listTemplatesSchema = {
+  'page': Joi.number().min(1).allow(''),
+  'q': Joi.string().label('query').allow(''),
+};
+
 module.exports = {
   templateIdSchema,
   createTemplateSchema,
   updateTemplateSchema,
+  listTemplatesSchema,
 };
 
