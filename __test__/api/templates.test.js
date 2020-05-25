@@ -14,6 +14,12 @@ const {
   createFieldMinimumLimitError,
 } = require('../../utils/mocks/createTemplateMock');
 
+const {
+  updateTemplateSuccess,
+  updateTemplateTypeError,
+  updateTemplateForbiddenPropertyError,
+} = require('../../utils/mocks/updateTemplateMock');
+
 const store = new MongoLib();
 
 describe('Testing the POST [templates] endpoint', () => {
@@ -31,20 +37,6 @@ describe('Testing the POST [templates] endpoint', () => {
 
     expect(deletedResponse.deletedId).toHaveLength(24);
     expect(deletedResponse.deletedCount).toBe(1);
-
-    await app.close();
-    await done();
-  });
-
-  it('Should test the post templates endpoint with a duplicated name and return a success message', async (done) => {
-
-    const responseDuplicated = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
-
-    expect(responseDuplicated.error).toBe(false);
-    expect(responseDuplicated.status).toBe(201);
-    expect(responseDuplicated.body.message).toBe('Template already exists');
-
-    await store.update('catalogs', {}, null, null, { 'medicalTests': createTemplateSuccess.name });
 
     await app.close();
     await done();
@@ -158,4 +150,80 @@ describe('Testing the POST [templates] endpoint', () => {
     await done();
   });
 
+});
+
+describe('Testing the PUT [templates] endpoint', () => {
+
+  it('Should test the update templates endpoint with a type error and return an error message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateTypeError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('"Field type" must be one of [string, number, select, text, file]');
+
+    const deletedResponse = await store.delete('templates', response.body.message.insertedId);
+
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update templates endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateSuccess);
+
+    expect(updatedResponse.error).toBe(false);
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body.message.matchedCount).toBe(1);
+    expect(updatedResponse.body.message.updatedCount).toBe(1);
+
+    const deletedResponse = await store.delete('templates', response.body.message.insertedId);
+
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
+
+  it('Should test the update templates endpoint with a forbidden property and return an error message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateForbiddenPropertyError);
+
+    expect(updatedResponse.body.error).toBe('Bad Request');
+    expect(updatedResponse.status).toBe(400);
+    expect(updatedResponse.body.message).toBe('\"fields[0].other\" is not allowed');
+
+    const deletedResponse = await store.delete('templates', response.body.message.insertedId);
+
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+  });
 });

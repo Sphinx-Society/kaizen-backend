@@ -4,6 +4,8 @@ const Controller = require('./index');
 
 const {
   createTemplateSchema,
+  updateTemplateSchema,
+  templateIdSchema,
 } = require('./schema');
 
 const router = express.Router();
@@ -14,13 +16,26 @@ const router = express.Router();
  */
 const Router = (validation) => {
 
+  /* CRUD OPERATIONS */
   router.post('/', validation(createTemplateSchema), insertTemplate);
+  router.put('/:templateId', validation({ templateId: templateIdSchema }, 'params'), validation(updateTemplateSchema), updateTemplate);
 
   function insertTemplate(req, res, next) {
 
     Controller.insertTemplate(req.body)
       .then((template) => {
         response.success(req, res, template, 201);
+      })
+      .catch(next);
+  }
+
+  function updateTemplate(req, res, next) {
+
+    const { templateId } = req.params;
+    const templateData = req.body;
+    Controller.updateTemplate(templateId, templateData)
+      .then((template) => {
+        response.success(req, res, template, 200);
       })
       .catch(next);
   }
