@@ -46,7 +46,7 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @param {String} templateId
    * @param {{}} templateData Object with the data to replace
-   * @returns {{"matchedCount": number, "updatedCount": number}} Update count
+   * @returns {Promise<{"matchedCount": number, "updatedCount": number}>} Update count
    */
   async function updateTemplate(templateId, templateData) {
 
@@ -82,13 +82,10 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
+   * Function that retrieves the list of active templates that match with the query filter
    *
-   *
-   * @param {String} query
-   * @returns {Promise <{templates: {},
-        currentPage: number),
-        totalPages: number,
-        totalDocuments:number}>}
+   * @param {String} query search filter
+   * @returns {Promise <{templates: {}, currentPage: number, totalPages: number, totalDocuments:number}>}
    */
   async function listTemplates(query) {
 
@@ -109,6 +106,22 @@ module.exports = function (InjectedStore, TABLE) {
         totalPages: pagination.totalPages,
         totalDocuments: pagination.totalDocuments,
       });
+
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
+  * Retrieves the data about template searched by id
+  * @param { String } templateId
+  * @return {Promise<*>}
+  */
+  async function getTemplateById(templateId) {
+    try {
+      const id = objectIdHandler(templateId);
+      const query = { ...id, active: true };
+      return await store.search(TABLE, query);
     } catch (error) {
       throw new Error(error);
     }
@@ -119,5 +132,6 @@ module.exports = function (InjectedStore, TABLE) {
     updateTemplate,
     deleteTemplate,
     listTemplates,
+    getTemplateById,
   };
 };
