@@ -54,8 +54,19 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  async function getTemplateById(templateId) {
+    try {
+      const id = objectIdHandler(templateId);
+      const query = { ...id, active: true };
+      return await store.search(TABLE, query);
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertTemplate,
     updateTemplate,
+    getTemplateById,
   };
 };

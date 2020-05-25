@@ -227,3 +227,40 @@ describe('Testing the PUT [templates] endpoint', () => {
     await done();
   });
 });
+
+describe('Testing the GET [templates/id] endpoint', () => {
+  it('Should test the get templates by id endpoint and return a success message', async (done) => {
+    const templateId = '5ec9fee83c8300347e2a670f';
+    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message[0]._id).toBe(templateId);
+    expect(response.body.message[0].active).toBe(true);
+    await app.close();
+    await done();
+  });
+
+  it('Should test the get templates by id endpoint and return a error message', async (done) => {
+    const templateId = '5ec9fee83c83003';
+    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+
+    expect(response.body.error).toBe('Bad Request');
+    expect(response.badRequest).toBe(true);
+    expect(response.status).toBe(400);
+    expect(response.body.message).toBe('"templateId" with value "5ec9fee83c83003" fails to match the required pattern: /^[0-9a-fA-F]{24}$/');
+    await app.close();
+    await done();
+  });
+
+  it('Should test the get templates by id endpoint and return a ny message', async (done) => {
+    const templateId = '5ecb30518904d04999e27ebc';
+    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+
+    expect(response.body.error).toBe(false);
+    expect(response.badRequest).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toStrictEqual([]);
+    await app.close();
+    await done();
+  });
+});
