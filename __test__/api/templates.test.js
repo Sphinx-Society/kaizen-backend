@@ -269,6 +269,35 @@ describe('Testing the DELETE [templates] endpoint', () => {
   });
 });
 
+describe('Testing the GET [templates] endpoint', () => {
+
+  it('Should test the get templates endpoint and return a success message', async (done) => {
+
+    const response = await supertest(app).get(`/api/${config.api.version}/templates`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the get templates endpoint with a page parameter and return a success message', async (done) => {
+
+    const page = 2;
+    const response = await supertest(app).get(`/api/${config.api.version}/templates?page=${page}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message.currentPage).toBe(page);
+
+    await app.close();
+    await done();
+  });
+});
+
 describe('Testing the GET [templates/id] endpoint', () => {
   it('Should test the get templates by id endpoint and return a success message', async (done) => {
     const templateId = '5ec9fee83c8300347e2a670f';
