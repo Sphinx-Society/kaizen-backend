@@ -23,32 +23,32 @@ const router = express.Router();
 const Router = (validation) => {
 
   /* CRUD OPERATIONS */
-  router.post('/', validation(createUserSchema), insertUser);
+  router.post('/', validation(createUserSchema), jwtAuthMiddleware, insertUser);
   router.post('/login', loginUser);
-  router.get('/', validation(listUsersSchema, 'query'), listUsers);
-  router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
-  router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
-  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+  router.get('/', validation(listUsersSchema, 'query'), jwtAuthMiddleware, listUsers);
+  router.get('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, getUser);
+  router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), jwtAuthMiddleware, updateUser);
+  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, deleteUser);
 
   /* AUTH OPERATIONS */
   router.post('/login', loginUser);
-  router.put('/resetPassword/:userId', validation({ userId: userIdSchema }, 'params'), resetPassword);
+  router.put('/resetPassword/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, resetPassword);
 
   /* PROFILE OPERATIONS */
-  router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), getUserProfile);
-  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
+  router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, getUserProfile);
+  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), jwtAuthMiddleware, updateUserProfile);
 
   /* MEDICAL TESTS OPERATIONS */
-  router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
-  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
-  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
-  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
-  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
+  router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), jwtAuthMiddleware, insertUserTest);
+  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, getUserTests);
+  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, getUserTest);
+  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, updateMedicalTest);
+  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, deleteUserTest);
 
   /* TEST RESULTS OPERATIONS */
-  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
-  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
-  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, getMedicalResults);
+  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, getResultsPdf);
+  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, upsertMedicalResults);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
