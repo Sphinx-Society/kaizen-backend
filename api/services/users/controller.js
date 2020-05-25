@@ -1,6 +1,6 @@
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
-const sendWelcomeEmailHandler = require('./handlers/sendWelcomeEmailHandler');
+const { sendWelcomeEmailHandler, sendRestPasswordEmailHandler } = require('./handlers/sendEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
 const paginationHandler = require('./handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
@@ -9,6 +9,7 @@ const createUserTestHandler = require('./handlers/createUserTestHandler');
 const projectionHandler = require('./handlers/projectionHandler');
 const objectIdHandler = require('../shared/handlers/objectIdHandler');
 const prefixHandler = require('./handlers/prefixHandler');
+const createPasswordHandler = require('./handlers/createPasswordHandler');
 const AWS = require('../../../lib/AWS');
 
 /**
@@ -162,6 +163,67 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
+   * Validate if user is successfully logged.
+   *
+   * @param user
+   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
+   */
+  async function loginUser(user) {
+    if (!user) {
+      throw new Error('User is required');
+    }
+    return loginUserHandler(user, store, TABLE);
+  }
+
+  /**
+   * Function that generates a new password for the user and send it a new one by email
+   *
+   * @param {String} userId
+   * @returns {{}} Object reset password results
+   */
+  async function resetPassword(userId) {
+
+    try {
+      const result = await store.get(TABLE, userId, { 'auth.email': 1, 'auth.username': 1, '_id': 0 });
+
+      if (!result) {
+        throw new Error('Invalid User');
+      }
+
+      const { email, username } = result.auth;
+
+      let passwords = await createPasswordHandler();
+
+      let { password, hashedPassword } = passwords;
+      let credentials = { username, password };
+      const updatedAt = Date.now();
+
+      const id = objectIdHandler(userId);
+      const updatedPassword = await store.update(TABLE, id, { 'auth.password': hashedPassword, updatedAt });
+
+      if (updatedPassword.updatedCount === 0) {
+        return updatedPassword;
+      }
+
+      const mailId = await sendRestPasswordEmailHandler({ email, credentials });
+
+      if (!mailId) {
+        throw new Error('Email couldn\'t sent');
+      }
+
+      hashedPassword = '';
+      password = '';
+      credentials = {};
+      passwords = {};
+
+      return updatedPassword;
+
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  /**
    * Function that add a medical test to user
    *
    * @param {*} userId
@@ -214,19 +276,6 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Validate if user is successfully logged.
-   *
-   * @param user
-   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
-   */
-  async function loginUser(user) {
-    if (!user) {
-      throw new Error('User is required');
-    }
-    return loginUserHandler(user, store, TABLE);
-  }
-
-  /**
    * Function that receives the userId and a property and returns property object of the userId.
    *
    * @param {*} userId
@@ -264,6 +313,7 @@ module.exports = function (InjectedStore, TABLE) {
       const operation = [{ $match: id }, { ...queryProjection }];
 
       const [result] = await store.aggregate(TABLE, operation);
+
       return result;
     } catch (error) {
       throw new Error(error);
@@ -310,6 +360,12 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   * Update data in MongoDB from test result
+   * @param {String} testsId
+   * @param  {Object} testResultsData
+   * @return {Promise<*>}
+   */
   async function upsertMedicalResultsData(testsId, testResultsData) {
     try {
       if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
@@ -330,6 +386,7 @@ module.exports = function (InjectedStore, TABLE) {
     updateUser,
     deleteUser,
     loginUser,
+    resetPassword,
     getUserProperty,
     getTests,
     addTestToUser,
