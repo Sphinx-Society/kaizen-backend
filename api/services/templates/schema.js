@@ -11,14 +11,12 @@ const createTemplateFieldSchema =
     'maxLimit': Joi.number().label('Field maximum limit').precision(2),
     'unit': Joi.string().label('Field unit').max(100),
     'options': Joi.array().label('Field options'),
-    'disabled': Joi.boolean().label('Field disabled').default(false),
     'required': Joi.boolean().label('Field required').default(false),
   }).required();
 
 const createTemplateSchema = {
   'name': Joi.string().label('Template name').max(100).required(),
   'type': Joi.string().label('Template type').max(100).required(),
-  'createdBy': Joi.string().label('Created by').max(100).required(),
   'fields': Joi.array().items(createTemplateFieldSchema).required(),
 };
 
