@@ -29,7 +29,6 @@ const updateTemplateFieldSchema =
     'maxLimit': Joi.number().label('Field maximum limit').precision(2),
     'unit': Joi.string().label('Field unit').max(100),
     'options': Joi.array().label('Field options'),
-    'disabled': Joi.boolean().label('Field disabled').default(false),
     'required': Joi.boolean().label('Field required').default(false),
   });
 
