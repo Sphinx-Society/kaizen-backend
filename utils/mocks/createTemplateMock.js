@@ -1,17 +1,12 @@
 const createTemplateSuccess = {
   'name': '5ec9fb04330b3b30157c31daS',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
   'fields': [
     {
       'id': '0001',
       'name': 'Nivel de glucosa',
       'type': 'number',
-      'minLimit': 126.50,
-      'maxLimit': 150.8,
-      'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
     {
@@ -21,7 +16,6 @@ const createTemplateSuccess = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': ['1 option', 2, {}],
-      'disabled': false,
       'required': false,
       'id': '0002',
     },
@@ -31,15 +25,12 @@ const createTemplateSuccess = {
       'type': 'number',
       'unit': 'ml',
       'options': ['1 option', 2, { 'other': 'thing' }],
-      'disabled': false,
       'required': false,
     },
     {
       'id': '0004',
       'name': 'Nivel de glucosa',
       'type': 'number',
-      'unit': 'ml',
-      'disabled': false,
       'required': false,
     },
   ],
@@ -47,7 +38,6 @@ const createTemplateSuccess = {
 
 const createTemplateNameError = {
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
   'fields': [
     {
       'id': '0001',
@@ -57,7 +47,6 @@ const createTemplateNameError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
   ],
@@ -65,7 +54,7 @@ const createTemplateNameError = {
 
 const createTemplateTypeError = {
   'name': 'GLUCOSA EN SANGRE',
-  'createdBy': 'arantxa.rosas.1234',
+
   'fields': [
     {
       'id': '0001',
@@ -75,7 +64,7 @@ const createTemplateTypeError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
+
       'required': false,
     },
   ],
@@ -93,7 +82,7 @@ const createTemplateCreatedByError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
+
       'required': false,
     },
   ],
@@ -102,14 +91,12 @@ const createTemplateCreatedByError = {
 const createTemplateFieldsEmptyError = {
   'name': 'GLUCOSA EN SANGRE',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
   'fields': [],
 };
 
 const createTemplateFieldIdError = {
   'name': 'GLUCOSA EN SANGRE',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
   'fields': [
     {
       'name': 'Nivel de glucosa',
@@ -118,7 +105,6 @@ const createTemplateFieldIdError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
   ],
@@ -127,7 +113,7 @@ const createTemplateFieldIdError = {
 const createTemplateFieldNameError = {
   'name': 'GLUCOSA EN SANGRE',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
+
   'fields': [
     {
       'id': '0001',
@@ -136,7 +122,6 @@ const createTemplateFieldNameError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
   ],
@@ -145,7 +130,7 @@ const createTemplateFieldNameError = {
 const createTemplateFieldTypeError = {
   'name': 'GLUCOSA EN SANGRE',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
+
   'fields': [
     {
       'id': '0001',
@@ -154,7 +139,6 @@ const createTemplateFieldTypeError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
   ],
@@ -163,7 +147,7 @@ const createTemplateFieldTypeError = {
 const createFieldMinimumLimitError = {
   'name': 'GLUCOSA EN SANGRE',
   'type': 'EXAMEN DE LABORATORIO',
-  'createdBy': 'arantxa.rosas.1234',
+
   'fields': [
     {
       'id': '0001',
@@ -173,7 +157,6 @@ const createFieldMinimumLimitError = {
       'maxLimit': 150.8,
       'unit': 'ml',
       'options': [],
-      'disabled': false,
       'required': false,
     },
   ],

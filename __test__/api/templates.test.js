@@ -66,18 +66,6 @@ describe('Testing the POST [templates] endpoint', () => {
     await done();
   });
 
-  it('Should test the post templates endpoint with a template Created By error and return an error message', async (done) => {
-
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateCreatedByError);
-
-    expect(response.status).toBe(400);
-    expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe('\"Created by\" is required');
-
-    await app.close();
-    await done();
-  });
-
   it('Should test the post templates endpoint with a template fields empty error and return an error message', async (done) => {
 
     const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldsEmptyError);
@@ -300,12 +288,24 @@ describe('Testing the GET [templates] endpoint', () => {
 
 describe('Testing the GET [templates/id] endpoint', () => {
   it('Should test the get templates by id endpoint and return a success message', async (done) => {
-    const templateId = '5ec9fee83c8300347e2a670f';
-    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+
     expect(response.error).toBe(false);
-    expect(response.status).toBe(200);
-    expect(response.body.message[0]._id).toBe(templateId);
-    expect(response.body.message[0].active).toBe(true);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const responseGet = await supertest(app).get(`/api/${config.api.version}/templates/${response.body.message.insertedId}`);
+    expect(responseGet.error).toBe(false);
+    expect(responseGet.status).toBe(200);
+    expect(responseGet.body.message[0]._id).toBe(response.body.message.insertedId);
+    expect(responseGet.body.message[0].active).toBe(true);
+
+    const deleteTemplate = await store.delete('templates', response.body.message.insertedId);
+
+    expect(deleteTemplate.deletedId).toHaveLength(24);
+    expect(deleteTemplate.deletedCount).toBe(1);
     await app.close();
     await done();
   });
