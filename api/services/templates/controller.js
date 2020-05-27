@@ -20,15 +20,10 @@ module.exports = function (InjectedStore, TABLE) {
 
     try {
 
-      const { name, type } = template;
-
-      const nameUpper = name.toUpperCase();
-      const typeUpper = type.toUpperCase();
-
       createdTemplate = {
         ...template,
-        name: nameUpper,
-        type: typeUpper,
+        name: template.name,
+        type: template.type,
         active: true,
         insertedAt: Date.now(),
       };
