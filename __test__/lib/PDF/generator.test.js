@@ -1,13 +1,17 @@
 const fs = require('fs');
 const generateDocument = require('../../../lib/PDF/generator');
 
-const path = './lib/PDF/data/result.pdf';
+const path = `${__dirname}/data/result.pdf`;
 
 describe('Testing to generate pdf', () => {
   it('Should return true if file exists', async (done) => {
     const data = {
-      title: 'Kaizen Medical Lab',
-      text: 'This a test message',
+      testId: 'Kaizen Medical Lab',
+      testName: 'This a test message',
+      doctorName: 'Alejandro Cortez',
+      doctorId: '1234567',
+      status: 'active',
+      updatedAt: Date.now(),
     };
 
     generateDocument(data, path);

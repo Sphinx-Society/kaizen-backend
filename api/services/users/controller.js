@@ -2,7 +2,7 @@ const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const { sendWelcomeEmailHandler, sendRestPasswordEmailHandler } = require('./handlers/sendEmailHandler');
 const queryParamsHandler = require('./handlers/queryParamsHandler');
-const paginationHandler = require('./handlers/paginationHandler');
+const paginationHandler = require('../shared/handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('../shared/handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
@@ -24,7 +24,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
    *
-   * @param {*} user
+   * @param {String} user
    * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
    */
 
@@ -84,7 +84,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that list the active users using pagination by sending the number of the page.
    * If user doesn't send the page parameter by default starts in 1.
    *
-   * @param {*} query
+   * @param {{}} query
    * @returns Promise<{ users: {} }>}
    */
   async function listUsers(query) {
@@ -100,6 +100,7 @@ module.exports = function (InjectedStore, TABLE) {
         users,
         totalPages: pagination.totalPages,
         currentPage: parseInt(page, 10),
+        totalDocuments: pagination.totalDocuments,
       });
     } catch (error) {
       throw new Error(error);
@@ -109,7 +110,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
    *
-   * @param {*} userId
+   * @param {String} userId
    * @returns {Promise<{ user: {}}>}
    */
   async function getUser(userId) {
@@ -125,7 +126,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that receives the userId and delete it.
    *
-   * @param {*} userId
+   * @param {String} userId
    * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
   async function updateUser(userId, userData) {
@@ -144,7 +145,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that receives the userId and delete its user.
    *
-   * @param {*} userId
+   * @param {String} userId
    *
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
@@ -153,7 +154,6 @@ module.exports = function (InjectedStore, TABLE) {
     try {
       const updatedAt = Date.now();
       const id = objectIdHandler(userId);
-      // const deletedCount = await store.delete(TABLE, userId);
       const deletedCount = await store.update(TABLE, id,
         { 'auth.active': false, updatedAt });
       return deletedCount;
@@ -179,7 +179,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that generates a new password for the user and send it a new one by email
    *
    * @param {String} userId
-   * @returns {{}} Object reset password results
+   * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>} Object reset password results
    */
   async function resetPassword(userId) {
 
@@ -226,8 +226,8 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that add a medical test to user
    *
-   * @param {*} userId
-   * @param {*} userData
+   * @param {String} userId
+   * @param {{}} userData
    * @returns Promise<{ tests: Object; }>
    */
   async function addTestToUser(userId, userData) {
@@ -278,7 +278,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that receives the userId and a property and returns property object of the userId.
    *
-   * @param {*} userId
+   * @param {String} userId
    * @returns {Promise<{ user: {profile: {}}}>}
    */
   async function getUserProperty(userId, property, filter) {
@@ -300,10 +300,10 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
    *
-   * @param {*} userId
-   * @param {*} property
-   * @param {*} filter
-   * @returns
+   * @param {String} userId
+   * @param {String} property
+   * @param {{}} filter
+   * @returns {Promise<{tests: {}}>}
    */
   async function getTests(userId, property, filter) {
     try {
@@ -325,7 +325,7 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @param {String} userId
    * @param {String} testId
-   * @returns {Object} results
+   * @returns {Promise <{results: {}}>} results
    */
   async function getTestResults(userId, testId) {
 
@@ -347,9 +347,9 @@ module.exports = function (InjectedStore, TABLE) {
  * Make a request to MongoDB in order to update a medical test info, if data was be updated,
  * the response have a property updatedCount with value 1 otherwise «zero»
  *
- * @param testsId
- * @param testData
- * @return {Promise<*>}
+ * @param {String} testsId
+ * @param {{}} testData
+ * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
  */
   async function updateMedicalTest(testsId, testData) {
     try {
@@ -364,7 +364,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Update data in MongoDB from test result
    * @param {String} testsId
    * @param  {Object} testResultsData
-   * @return {Promise<*>}
+   * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
    */
   async function upsertMedicalResultsData(testsId, testResultsData) {
     try {

@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const cors = require('cors');
 const Routes = require('./api/routes');
 const config = require('./config/index');
 const notFoundMiddleware = require('./middleware/notFoundMiddleware');
@@ -12,6 +13,8 @@ const {
 const app = express();
 
 app.use(express.json());
+
+app.use(cors());
 
 app.use(session({
   secret: config.server.sessionKey,

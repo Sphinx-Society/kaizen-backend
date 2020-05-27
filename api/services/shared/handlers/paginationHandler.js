@@ -12,7 +12,7 @@
 async function paginationHandler(page, store, table, query) {
 
   const noPage = parseInt(page, 10);
-  const size = 3;
+  const size = 10;
   const pagination = {};
 
   pagination.skip = size * (noPage - 1);
@@ -21,6 +21,7 @@ async function paginationHandler(page, store, table, query) {
   const count = await store.countDocuments(table, query);
 
   pagination.totalPages = Math.ceil(count / size);
+  pagination.totalDocuments = count;
 
   return pagination;
 }

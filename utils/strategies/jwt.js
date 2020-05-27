@@ -11,7 +11,7 @@ const actionStrategy = (tokenPayload, done) => {
   if (!tokenPayload) {
     throw new Error('Token from authorization not found');
   }
-  done(null, { active: tokenPayload.active });
+  done(null, { ...tokenPayload });
 };
 
 passport.use('jwt', new Strategy(strategyOpts, actionStrategy));

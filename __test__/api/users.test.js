@@ -25,9 +25,10 @@ const {
   createUserTestSuccess,
 } = require('../../utils/mocks/updateUserMock');
 
-const { userLoginMock, userLoginFailMock } = require('../../utils/mocks/userLoginMock');
+const { userLoginMock, userLoginFailMock, bearerToken } = require('../../utils/mocks/userLoginMock');
 
 const store = new MongoLib();
+const token = bearerToken;
 
 afterAll = async (done) => {
   await app.close();
@@ -72,7 +73,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint and return a success message then delete it with delete user endpoint', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
@@ -86,7 +87,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a First Name error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserFirstNameError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserFirstNameError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -99,7 +100,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a Last Name error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserLastNameError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserLastNameError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -112,7 +113,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a Birth Date error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserBirthDateError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserBirthDateError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -125,7 +126,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a Phone Number format error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserPhoneNumberError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserPhoneNumberError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -138,7 +139,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a Phone Number null error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserPhoneNumberNullError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserPhoneNumberNullError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -151,7 +152,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a gender error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserGenderError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserGenderError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -164,7 +165,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a gender error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserCountryError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserCountryError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -177,7 +178,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a gender error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserDocumentIdError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserDocumentIdError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -189,7 +190,7 @@ describe('Testing the POST [users] endpoint', () => {
   });
   it('Should test the post users endpoint with a email format error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserEmailError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserEmailError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -202,7 +203,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a Role error and returns an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserRoleError);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserRoleError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -215,7 +216,7 @@ describe('Testing the POST [users] endpoint', () => {
 
   it('Should test the post users endpoint with a duplicated document id and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
@@ -232,7 +233,7 @@ describe('Testing the GET [users] endpoint', () => {
 
   it('Should test the get users endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).get(`/api/${config.api.version}/users`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -245,7 +246,7 @@ describe('Testing the GET [users] endpoint', () => {
   it('Should test the get users endpoint with documentId parameter existing in DB and return a success message', async (done) => {
 
     const documentId = '12345678909';
-    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -260,7 +261,7 @@ describe('Testing the GET [users] endpoint', () => {
   it('Should test the get users endpoint with documentId parameter non-existent in DB and return a success message', async (done) => {
 
     const documentId = '12234556778';
-    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -282,7 +283,7 @@ describe('Testing the GET [users] endpoint', () => {
     'Should test the get users endpoint with a valid role parameter ("%s" = %s) and return a success message',
     async (input, output) => {
 
-      const response = await supertest(app).get(`/api/${config.api.version}/users?role=${input}`);
+      const response = await supertest(app).get(`/api/${config.api.version}/users?role=${input}`).set('Authorization', `bearer ${token}`);
 
       expect(response.status).toBe(200);
       expect(response.error).toBe(false);
@@ -294,7 +295,7 @@ describe('Testing the GET [users] endpoint', () => {
 
   it('Should test the get users endpoint with invalid role parameter and return an error message', async (done) => {
 
-    const response = await supertest(app).get(`/api/${config.api.version}/users?role=xyz`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?role=xyz`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -308,7 +309,7 @@ describe('Testing the GET [users] endpoint', () => {
   it('Should test the get users endpoint with a page parameter and return a success message', async (done) => {
 
     const page = 2;
-    const response = await supertest(app).get(`/api/${config.api.version}/users?page=${page}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?page=${page}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -326,7 +327,7 @@ describe('Testing the GET [user] endpoint', () => {
   it('Should test the get user endpoint with valid userId parameter and return an success message', async (done) => {
 
     const userId = '5eb8c73377d75e0b8a77d9b4';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -341,7 +342,7 @@ describe('Testing the GET [user] endpoint', () => {
   it('Should test the get user endpoint with valid non-existent userId parameter and return an success message', async (done) => {
 
     const userId = '5ebb7404463b3a27e8e9cea3';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -356,7 +357,7 @@ describe('Testing the GET [user] endpoint', () => {
   it('Should test the get user endpoint with invalid userId parameter and return an error message', async (done) => {
 
     const invalidUserId = '5ebb7404463b3a27e8e9cea';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${invalidUserId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${invalidUserId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -370,7 +371,7 @@ describe('Testing the GET [user] endpoint', () => {
 
 describe('Testing the POST [login] endpoint', () => {
   it('Should test the login users endpoint and return the auth token', async (done) => {
-    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginMock);
+    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginMock).set('Authorization', `bearer ${token}`);
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
     expect(response.body.message).toHaveProperty('jwt');
@@ -380,7 +381,7 @@ describe('Testing the POST [login] endpoint', () => {
   });
 
   it('Should test the login users endpoint and error', async (done) => {
-    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginFailMock);
+    const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginFailMock).set('Authorization', `bearer ${token}`);
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
     expect(response.body.message).toBe('Username or password is incorrect');
@@ -393,7 +394,7 @@ describe('Testing the POST [login] endpoint', () => {
 describe('Testing the POST [resetPassword] endpoint', () => {
   it('Should test the resetPassword endpoint with an inexistent user and return error', async (done) => {
     const userId = '5eb8c73377d75e0b8a77d9b0';
-    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`);
+    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`).set('Authorization', `bearer ${token}`);
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
     expect(response.body.message).toBe('Error: Invalid User');
@@ -405,7 +406,7 @@ describe('Testing the POST [resetPassword] endpoint', () => {
   it('Should test the resetPassword endpoint with a valid user and return success', async (done) => {
 
     const userId = '5eb8c73377d75e0b8a77d9b4';
-    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`);
+    const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`).set('Authorization', `bearer ${token}`);
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
     expect(response.body.message).toHaveProperty('matchedCount');
@@ -422,13 +423,13 @@ describe('Testing the PUT [user] endpoint', () => {
 
   it('Should test the update users endpoint and return a success message then delete it with delete user endpoint', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}`).send(updateUserSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}`).send(updateUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -447,7 +448,7 @@ describe('Testing the PUT [user] endpoint', () => {
   it('Should test the update users endpoint updating a forbidden property and return an error message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserForbiddenPropertyError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserForbiddenPropertyError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -460,7 +461,7 @@ describe('Testing the PUT [user] endpoint', () => {
   it('Should test the update users endpoint updating an incorrect userId and return an error message', async (done) => {
 
     const incorrectUserId = '11111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}`).send(updateUserSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}`).send(updateUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -473,7 +474,7 @@ describe('Testing the PUT [user] endpoint', () => {
   it('Should test the update users endpoint updating an invalid property and return an error message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserInvalidPropertyError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserInvalidPropertyError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -486,7 +487,7 @@ describe('Testing the PUT [user] endpoint', () => {
   it('Should test the update users endpoint updating an non-existent userId and return a success message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}`).send(updateUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -501,14 +502,14 @@ describe('Testing the PUT [user] endpoint', () => {
 describe('Testing the DELETE [user] endpoint', () => {
   it('Should test the delete users endpoint deleting a userId and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${response.body.message.insertedId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -527,7 +528,7 @@ describe('Testing the DELETE [user] endpoint', () => {
   it('Should test the delete users endpoint deleting an non-existent userId and return a success message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -543,14 +544,14 @@ describe('Testing the GET [user/profile] endpoint', () => {
 
   it('Should test the get user/profile endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const getResponse = await supertest(app).get(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`);
+    const getResponse = await supertest(app).get(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`).set('Authorization', `bearer ${token}`);
 
     expect(getResponse.error).toBe(false);
     expect(getResponse.status).toBe(200);
@@ -571,14 +572,14 @@ describe('Testing the PUT [user/profile] endpoint', () => {
 
   it('Should test the update user/profile endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`).send(updateUserProfileSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${response.body.message.insertedId}/profile`).send(updateUserProfileSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -596,7 +597,7 @@ describe('Testing the PUT [user/profile] endpoint', () => {
   it('Should test the update user/profile endpoint updating a forbidden property and return an error message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserForbiddenPropertyError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserForbiddenPropertyError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -609,7 +610,7 @@ describe('Testing the PUT [user/profile] endpoint', () => {
   it('Should test the update user/profile endpoint updating an incorrect userId and return an error message', async (done) => {
 
     const incorrectUserId = '11111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}/profile`).send(updateUserProfileSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${incorrectUserId}/profile`).send(updateUserProfileSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -622,7 +623,7 @@ describe('Testing the PUT [user/profile] endpoint', () => {
   it('Should test the update user/profile endpoint updating an invalid property and return an error message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileInvalidPropertyError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileInvalidPropertyError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -635,7 +636,7 @@ describe('Testing the PUT [user/profile] endpoint', () => {
   it('Should test the update users endpoint updating an non-existent userId and return a success message', async (done) => {
 
     const userId = '111111111111111111111111';
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/users/${userId}/profile`).send(updateUserProfileSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -651,14 +652,14 @@ describe('Testing the POST [user/tests] endpoint', () => {
 
   it('Should test the create user/tests endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -676,21 +677,21 @@ describe('Testing the POST [user/tests] endpoint', () => {
 
   it('Should test the create user/tests endpoint with a duplicated test and return a error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+    const updatedResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
     expect(updatedResponse.body.message.matchedCount).toBe(1);
     expect(updatedResponse.body.message.updatedCount).toBe(1);
 
-    const createSameTestResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess);
+    const createSameTestResponse = await supertest(app).post(`/api/${config.api.version}/users/${response.body.message.insertedId}/tests`).send(createUserTestSuccess).set('Authorization', `bearer ${token}`);
 
     expect(createSameTestResponse.body.error).toBe('Bad Request');
     expect(createSameTestResponse.status).toBe(400);
@@ -710,7 +711,7 @@ describe('Testing the GET [user/tests] endpoint', () => {
   it('Should test the get user/tests endpoint with done status and return a success message', async (done) => {
 
     const userId = '5ec5f50ea76d8d1b91de94e5';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=D`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=D`).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -724,7 +725,7 @@ describe('Testing the GET [user/tests] endpoint', () => {
   it('Should test the get user/tests endpoint with pending status and return a success message', async (done) => {
 
     const userId = '5ec5f50ea76d8d1b91de94e5';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=P`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests?status=P`).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -742,7 +743,7 @@ describe('Testing the GET [user/test] endpoint', () => {
 
     const userId = '111111111111111111111111';
     const testId = 'SqjEUEqZyh0BJbrP6H1mX';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -757,7 +758,7 @@ describe('Testing the GET [user/test] endpoint', () => {
 
     const userId = '111111111111111111111111';
     const testId = 'SqjEUEqZyh0BJbrP6H1m';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.body.error).toBe('Bad Request');
     expect(response.status).toBe(400);
@@ -776,7 +777,7 @@ describe('Testing the DELETE [user/test] endpoint', () => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -790,7 +791,7 @@ describe('Testing the DELETE [user/test] endpoint', () => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = '000000000000000000003';
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -806,7 +807,7 @@ describe('Testing the DELETE [user/test] endpoint', () => {
     const userId = '111111111111111111111111';
     const testId = 'U1wBq5pfs-3IX4EfMZomh';
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -833,7 +834,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -860,7 +861,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -892,7 +893,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -921,7 +922,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -949,7 +950,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -966,7 +967,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     const response = await supertest(app)
       .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
-      .send(payload);
+      .send(payload).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -982,7 +983,7 @@ describe('Testing the GET [user/test/results] endpoint', () => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
@@ -997,7 +998,7 @@ describe('Testing the GET [user/test/results] endpoint', () => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'SqjEUEqZyh0BJbrP6H1m';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.body.error).toBe('Bad Request');
     expect(response.status).toBe(400);
@@ -1012,7 +1013,7 @@ describe('Testing the GET [user/test/results] endpoint', () => {
 
     const userId = '5ec1c0336ac96a15145fe89';
     const testId = 'SqjEUEqZyh0BJbrP6H1mX';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.body.error).toBe('Bad Request');
     expect(response.status).toBe(400);
@@ -1027,7 +1028,7 @@ describe('Testing the GET [user/test/results] endpoint', () => {
 
     const userId = '111111111111111111111111';
     const testId = 'SqjEUEqZyh0BJbrP6H1mX';
-    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
