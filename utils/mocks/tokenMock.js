@@ -11,6 +11,7 @@ module.exports = async function () {
   };
 
   const [user] = await store.search(collection, query);
+  const [permissions] = await store.search('permissions', {});
 
   const payload = {
     firstName: user.profile.firstName,
@@ -20,11 +21,12 @@ module.exports = async function () {
     role: user.auth.role,
     username: user.auth.username,
     active: user.auth.active,
+    permission: permissions[user.auth.role],
   };
 
-  store.client.close();
+  await store.client.close();
 
   return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: '1d',
+    expiresIn: '365d',
   });
 };

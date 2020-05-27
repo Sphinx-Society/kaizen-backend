@@ -17,6 +17,7 @@ module.exports = (req, res, next) => {
         statusCode: 401,
       });
     }
+    req.payload = user;
     next();
   })(req, res, next);
 };

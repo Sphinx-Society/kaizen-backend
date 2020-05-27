@@ -4,6 +4,7 @@ const generatorDocument = require('../../../lib/PDF/generator');
 const response = require('../../../network/response');
 const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
+const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
 const {
   userIdSchema,
   createUserSchema,
@@ -23,32 +24,32 @@ const router = express.Router();
 const Router = (validation) => {
 
   /* CRUD OPERATIONS */
-  router.post('/', validation(createUserSchema), insertUser);
+  router.post('/', validation(createUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), insertUser);
   router.post('/login', loginUser);
-  router.get('/', validation(listUsersSchema, 'query'), listUsers);
-  router.get('/:userId', validation({ userId: userIdSchema }, 'params'), getUser);
-  router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
-  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), deleteUser);
+  router.get('/', validation(listUsersSchema, 'query'), jwtAuthMiddleware, scopeValidationMiddleware(['read:listUsers']), listUsers);
+  router.get('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:getUserById']), getUser);
+  router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['update:updateUserById']), updateUser);
+  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['delete:deleteUserById']), deleteUser);
 
   /* AUTH OPERATIONS */
   router.post('/login', loginUser);
-  router.put('/resetPassword/:userId', validation({ userId: userIdSchema }, 'params'), resetPassword);
+  router.put('/resetPassword/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:password']), resetPassword);
 
   /* PROFILE OPERATIONS */
-  router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), getUserProfile);
-  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
+  router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:profile']), getUserProfile);
+  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), jwtAuthMiddleware, scopeValidationMiddleware(['update:profile']), updateUserProfile);
 
   /* MEDICAL TESTS OPERATIONS */
-  router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
-  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), getUserTests);
-  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
-  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
-  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
+  router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), jwtAuthMiddleware, scopeValidationMiddleware(['create:test']), insertUserTest);
+  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:test']), getUserTests);
+  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:testById']), getUserTest);
+  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:testById']), updateMedicalTest);
+  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['delete:testById']), deleteUserTest);
 
   /* TEST RESULTS OPERATIONS */
-  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
-  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
-  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), getMedicalResults);
+  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), getResultsPdf);
+  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), upsertMedicalResults);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {

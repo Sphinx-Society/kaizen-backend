@@ -6,7 +6,7 @@ module.exports = async function (user, store, collection) {
 
   const query = { 'auth.username': user.username };
   const [userFromMongo] = await store.search(collection, query);
-
+  const [permissions] = await store.search('permissions', {});
   if (!(await bcrypt.compare(user.password, userFromMongo.auth.password))) {
     throw new Error('Username or password is incorrect');
   }
@@ -21,6 +21,7 @@ module.exports = async function (user, store, collection) {
     role: userFromMongo.auth.role,
     username: userFromMongo.auth.username,
     active: userFromMongo.auth.active,
+    permission: permissions[userFromMongo.auth.role],
   };
 
   const token = jwt.sign(payload, config.jwt.secret, {

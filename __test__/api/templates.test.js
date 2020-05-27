@@ -6,7 +6,6 @@ const {
   createTemplateSuccess,
   createTemplateNameError,
   createTemplateTypeError,
-  createTemplateCreatedByError,
   createTemplateFieldsEmptyError,
   createTemplateFieldIdError,
   createTemplateFieldNameError,
@@ -20,13 +19,16 @@ const {
   updateTemplateForbiddenPropertyError,
 } = require('../../utils/mocks/updateTemplateMock');
 
+const { bearerToken } = require('../../utils/mocks/userLoginMock');
+
 const store = new MongoLib();
+const token = bearerToken;
 
 describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
@@ -44,7 +46,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template name error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateNameError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateNameError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -56,7 +58,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template type error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateTypeError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateTypeError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -68,7 +70,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template fields empty error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldsEmptyError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldsEmptyError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -80,7 +82,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template field id error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldIdError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldIdError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -92,7 +94,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template field name error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldNameError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldNameError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -104,7 +106,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template field type error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldTypeError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldTypeError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -116,7 +118,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template field type error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldTypeError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateFieldTypeError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -128,7 +130,7 @@ describe('Testing the POST [templates] endpoint', () => {
 
   it('Should test the post templates endpoint with a template field minimum error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createFieldMinimumLimitError);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createFieldMinimumLimitError).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
@@ -144,14 +146,14 @@ describe('Testing the PUT [templates] endpoint', () => {
 
   it('Should test the update templates endpoint with a type error and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateTypeError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateTypeError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -168,14 +170,14 @@ describe('Testing the PUT [templates] endpoint', () => {
 
   it('Should test the update templates endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateSuccess);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.error).toBe(false);
     expect(updatedResponse.status).toBe(200);
@@ -193,14 +195,14 @@ describe('Testing the PUT [templates] endpoint', () => {
 
   it('Should test the update templates endpoint with a forbidden property and return an error message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateForbiddenPropertyError);
+    const updatedResponse = await supertest(app).put(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).send(updateTemplateForbiddenPropertyError).set('Authorization', `bearer ${token}`);
 
     expect(updatedResponse.body.error).toBe('Bad Request');
     expect(updatedResponse.status).toBe(400);
@@ -219,14 +221,14 @@ describe('Testing the PUT [templates] endpoint', () => {
 describe('Testing the DELETE [templates] endpoint', () => {
   it('Should test the delete template endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${response.body.message.insertedId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -245,7 +247,7 @@ describe('Testing the DELETE [templates] endpoint', () => {
   it('Should test the delete template endpoint with an inexistent template and return a success message', async (done) => {
 
     const templateId = '000000000000000000000001';
-    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${templateId}`);
+    const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/templates/${templateId}`).set('Authorization', `bearer ${token}`);
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
@@ -261,7 +263,7 @@ describe('Testing the GET [templates] endpoint', () => {
 
   it('Should test the get templates endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).get(`/api/${config.api.version}/templates`);
+    const response = await supertest(app).get(`/api/${config.api.version}/templates`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -274,7 +276,7 @@ describe('Testing the GET [templates] endpoint', () => {
   it('Should test the get templates endpoint with a page parameter and return a success message', async (done) => {
 
     const page = 2;
-    const response = await supertest(app).get(`/api/${config.api.version}/templates?page=${page}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/templates?page=${page}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -289,14 +291,14 @@ describe('Testing the GET [templates] endpoint', () => {
 describe('Testing the GET [templates/id] endpoint', () => {
   it('Should test the get templates by id endpoint and return a success message', async (done) => {
 
-    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess);
+    const response = await supertest(app).post(`/api/${config.api.version}/templates`).send(createTemplateSuccess).set('Authorization', `bearer ${token}`);
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
 
-    const responseGet = await supertest(app).get(`/api/${config.api.version}/templates/${response.body.message.insertedId}`);
+    const responseGet = await supertest(app).get(`/api/${config.api.version}/templates/${response.body.message.insertedId}`).set('Authorization', `bearer ${token}`);
     expect(responseGet.error).toBe(false);
     expect(responseGet.status).toBe(200);
     expect(responseGet.body.message[0]._id).toBe(response.body.message.insertedId);
@@ -312,7 +314,7 @@ describe('Testing the GET [templates/id] endpoint', () => {
 
   it('Should test the get templates by id endpoint and return an error message', async (done) => {
     const templateId = '5ec9fee83c83003';
-    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.body.error).toBe('Bad Request');
     expect(response.badRequest).toBe(true);
@@ -324,7 +326,7 @@ describe('Testing the GET [templates/id] endpoint', () => {
 
   it('Should test the get templates by id endpoint and returns an empty object inside the "message" property', async (done) => {
     const templateId = '5ecb30518904d04999e27ebc';
-    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/templates/${templateId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.body.error).toBe(false);
     expect(response.badRequest).toBe(false);
