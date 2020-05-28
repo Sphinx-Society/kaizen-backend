@@ -28,7 +28,7 @@ module.exports = function (InjectedStore, TABLE) {
    * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
    */
 
-  async function insertUser(user) {
+  async function insertUser(user, createdBy) {
 
     try {
 
@@ -44,7 +44,7 @@ module.exports = function (InjectedStore, TABLE) {
         throw new Error('Invalid User');
       }
 
-      const createdUser = await createUserHandler(user, credentials);
+      const createdUser = await createUserHandler(user, credentials, createdBy);
 
       if (!createdUser) {
         throw new Error('Invalid User');
@@ -129,11 +129,11 @@ module.exports = function (InjectedStore, TABLE) {
    * @param {String} userId
    * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
-  async function updateUser(userId, userData) {
+  async function updateUser(userId, userData, updatedBy) {
 
     try {
       const id = objectIdHandler(userId);
-      const updateUser = updateObjectHandler(userData);
+      const updateUser = updateObjectHandler(userData, updatedBy);
 
       const updatedCount = await store.update(TABLE, id, updateUser);
       return updatedCount;
@@ -149,13 +149,13 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
-  async function deleteUser(userId) {
+  async function deleteUser(userId, updatedBy) {
 
     try {
       const updatedAt = Date.now();
       const id = objectIdHandler(userId);
       const deletedCount = await store.update(TABLE, id,
-        { 'auth.active': false, updatedAt });
+        { 'auth.active': false, updatedAt, updatedBy });
       return deletedCount;
     } catch (error) {
       throw new Error(error);
@@ -181,7 +181,7 @@ module.exports = function (InjectedStore, TABLE) {
    * @param {String} userId
    * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>} Object reset password results
    */
-  async function resetPassword(userId) {
+  async function resetPassword(userId, updatedBy) {
 
     try {
       const result = await store.get(TABLE, userId, { 'auth.email': 1, 'auth.username': 1, '_id': 0 });
@@ -199,7 +199,7 @@ module.exports = function (InjectedStore, TABLE) {
       const updatedAt = Date.now();
 
       const id = objectIdHandler(userId);
-      const updatedPassword = await store.update(TABLE, id, { 'auth.password': hashedPassword, updatedAt });
+      const updatedPassword = await store.update(TABLE, id, { 'auth.password': hashedPassword, updatedAt, updatedBy });
 
       if (updatedPassword.updatedCount === 0) {
         return updatedPassword;
@@ -230,13 +230,13 @@ module.exports = function (InjectedStore, TABLE) {
    * @param {{}} userData
    * @returns Promise<{ tests: Object; }>
    */
-  async function addTestToUser(userId, userData) {
+  async function addTestToUser(userId, userData, requestBy) {
 
     try {
 
       const updatedAt = Date.now();
       const id = objectIdHandler(userId);
-      const updatedData = await createUserTestHandler(store, TABLE, userId, userData);
+      const updatedData = await createUserTestHandler(store, TABLE, userId, userData, requestBy);
 
       const updatedCount = await store.update(TABLE, id, { updatedAt }, updatedData);
       return updatedCount;
@@ -252,7 +252,7 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
-  async function deleteUserTest(userTestId) {
+  async function deleteUserTest(userTestId, updatedBy) {
 
     try {
 
@@ -263,10 +263,12 @@ module.exports = function (InjectedStore, TABLE) {
       if (existsResults >= 1) {
         return 'Cannot delete because it has results';
       }
-      const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId }, {
-        'tests.$.status': 'INACTIVE',
-        updatedAt,
-      });
+      const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId },
+        {
+          'tests.$.status': 'INACTIVE',
+          'tests.$.updatedBy': updatedBy,
+          'tests.$.updatedAt': updatedAt,
+        });
 
       return deletedCount;
 
@@ -351,10 +353,15 @@ module.exports = function (InjectedStore, TABLE) {
  * @param {{}} testData
  * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
  */
-  async function updateMedicalTest(testsId, testData) {
+  async function updateMedicalTest(testsId, testData, updatedBy) {
     try {
-      const updateUser = prefixHandler('tests', testData);
-      return await store.update(TABLE, { 'tests.testId': testsId }, updateUser);
+      const test = prefixHandler('tests', testData);
+
+      const updateTest = {
+        ...test,
+        updatedBy,
+      };
+      return await store.update(TABLE, { 'tests.testId': testsId }, updateTest);
     } catch (error) {
       throw new Error(error);
     }
@@ -366,12 +373,14 @@ module.exports = function (InjectedStore, TABLE) {
    * @param  {Object} testResultsData
    * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
    */
-  async function upsertMedicalResultsData(testsId, testResultsData) {
+  async function upsertMedicalResultsData(testsId, resultsData, updatedBy) {
     try {
+      const testResultsData = resultsData;
       if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
-
       if (!Object.entries(testResultsData)[0].includes('results')) throw new Error('Object to update must contain results key');
 
+      testResultsData.results.updatedBy = updatedBy;
+      testResultsData.results.updatedAt = Date.now();
       const updateResults = prefixHandler('tests', testResultsData);
       return await store.update(TABLE, { 'tests.testId': testsId }, updateResults);
     } catch (error) {
