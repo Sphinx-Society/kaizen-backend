@@ -14,6 +14,7 @@ module.exports = async function (user, store, collection) {
   delete user.password;
 
   const payload = {
+    userId: userFromMongo._id,
     firstName: userFromMongo.profile.firstName,
     lastName: userFromMongo.profile.lastName,
     documentId: userFromMongo.profile.documentId,
