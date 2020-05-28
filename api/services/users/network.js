@@ -5,6 +5,7 @@ const response = require('../../../network/response');
 const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
+const updatedByHelper = require('../../../utils/helpers/updatedByHelper');
 const {
   userIdSchema,
   createUserSchema,
@@ -25,7 +26,6 @@ const Router = (validation) => {
 
   /* CRUD OPERATIONS */
   router.post('/', validation(createUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), insertUser);
-  router.post('/login', loginUser);
   router.get('/', validation(listUsersSchema, 'query'), jwtAuthMiddleware, scopeValidationMiddleware(['read:listUsers']), listUsers);
   router.get('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:getUserById']), getUser);
   router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['update:updateUserById']), updateUser);
@@ -53,7 +53,9 @@ const Router = (validation) => {
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
-    Controller.insertUser(req.body)
+
+    const createdBy = updatedByHelper(req.payload);
+    Controller.insertUser(req.body, createdBy)
       .then((user) => {
         response.success(req, res, user, 201);
       })
@@ -78,9 +80,11 @@ const Router = (validation) => {
   }
 
   function updateUser(req, res, next) {
+
     const { userId } = req.params;
     const userData = req.body;
-    Controller.updateUser(userId, userData)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.updateUser(userId, userData, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -89,7 +93,8 @@ const Router = (validation) => {
 
   function deleteUser(req, res, next) {
     const { userId } = req.params;
-    Controller.deleteUser(userId)
+    const deletedBy = updatedByHelper(req.payload);
+    Controller.deleteUser(userId, deletedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -107,7 +112,8 @@ const Router = (validation) => {
 
   function resetPassword(req, res, next) {
     const { userId } = req.params;
-    Controller.resetPassword(userId)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.resetPassword(userId, updatedBy)
       .then((data) => {
         response.success(req, res, data, 200);
       })
@@ -127,7 +133,8 @@ const Router = (validation) => {
   function updateUserProfile(req, res, next) {
     const { userId } = req.params;
     const userData = req.body;
-    Controller.updateUser(userId, userData)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.updateUser(userId, userData, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -138,7 +145,8 @@ const Router = (validation) => {
   function insertUserTest(req, res, next) {
     const { userId } = req.params;
     const userData = req.body;
-    Controller.addTestToUser(userId, userData)
+    const requestBy = updatedByHelper(req.payload);
+    Controller.addTestToUser(userId, userData, requestBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -165,7 +173,8 @@ const Router = (validation) => {
 
   function deleteUserTest(req, res, next) {
     const { testId } = req.params;
-    Controller.deleteUserTest(testId)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.deleteUserTest(testId, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -175,7 +184,8 @@ const Router = (validation) => {
   function updateMedicalTest(req, res, next) {
     const { testId } = req.params;
     const testData = req.body;
-    Controller.updateMedicalTest(testId, testData)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.updateMedicalTest(testId, testData, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
@@ -195,7 +205,8 @@ const Router = (validation) => {
   function upsertMedicalResults(req, res, next) {
     const { testId } = req.params;
     const testResultsData = req.body;
-    Controller.upsertMedicalResultsData(testId, testResultsData)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.upsertMedicalResultsData(testId, testResultsData, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })

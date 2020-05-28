@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt');
  * @param {*} credentials
  * @returns
  */
-async function createUserHandler(user, credentials) {
+async function createUserHandler(user, credentials, createdBy) {
 
   if (!user || !credentials) {
     return null;
@@ -33,6 +33,7 @@ async function createUserHandler(user, credentials) {
     },
     tests: [],
     insertedAt,
+    createdBy,
   };
 
   password = null;

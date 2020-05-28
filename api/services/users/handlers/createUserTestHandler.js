@@ -1,5 +1,5 @@
-const { ObjectId } = require('mongodb');
 const { nanoid } = require('nanoid');
+const objectIdHandler = require('../../shared/handlers/objectIdHandler');
 
 /**
  * Function that validates if test can be saved in a user.
@@ -10,9 +10,16 @@ const { nanoid } = require('nanoid');
  * @param {*} data
  * @returns Promise<{ tests: Object; }>
  */
-async function createUserTestHandler(store, TABLE, userId, data) {
+async function createUserTestHandler(store, TABLE, userId, data, requestBy) {
 
-  const count = await store.countDocuments(TABLE, { $and: [{ '_id': ObjectId(userId) }, { 'tests.testName': data.tests.testName }, { 'tests.status': 'PENDING' }] });
+  id = objectIdHandler(userId);
+
+  const isPatient = await store.countDocuments(TABLE, { $and: [id, { 'auth.role': 'patient' }] });
+
+  if (isPatient !== 1) {
+    throw new Error('This user is not a patient');
+  }
+  const count = await store.countDocuments(TABLE, { $and: [id, { 'tests.testName': data.tests.testName }, { 'tests.status': 'PENDING' }] });
 
   if (count >= 1) {
     throw new Error('A pending medical test already exists in user');
@@ -24,6 +31,8 @@ async function createUserTestHandler(store, TABLE, userId, data) {
       doctorName: data.tests.doctorName,
       doctorId: data.tests.doctorId,
       status: 'PENDING',
+      requestBy,
+      requestedAt: Date.now(),
     },
   };
 

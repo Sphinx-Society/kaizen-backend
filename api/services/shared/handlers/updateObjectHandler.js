@@ -23,12 +23,12 @@ function objectNestedToFlat(res, key, val, pre = '') {
  * @param {*} data
  * @returns Object
  */
-function updateObjectHandler(data) {
+function updateObjectHandler(data, updatedBy) {
 
   const updateObject = Object.keys(data).reduce((prev, curr) => objectNestedToFlat(prev, curr, data[curr]), {});
   const updatedAt = Date.now();
 
-  return { ...updateObject, updatedAt };
+  return { ...updateObject, updatedAt, updatedBy };
 }
 
 module.exports = updateObjectHandler;
