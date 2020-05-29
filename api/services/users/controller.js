@@ -24,10 +24,10 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
    *
-   * @param {String} user
+   * @param {string} user
+   * @param {{}} createdBy Object that includes the information from the user that is doing the request
    * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
    */
-
   async function insertUser(user, createdBy) {
 
     try {
@@ -85,6 +85,7 @@ module.exports = function (InjectedStore, TABLE) {
    * If user doesn't send the page parameter by default starts in 1.
    *
    * @param {{}} query
+   * @param {string} userRole
    * @returns Promise<{ users: {} }>}
    */
   async function listUsers(query, userRole) {
@@ -124,7 +125,9 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Function that receives the userId and delete it.
    *
-   * @param {String} userId
+   * @param {String} userId id of the user that will be modified
+   * @param {{}} userData Object that includes the data that will modify the document
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise<{ updatedId: String, updatedCount: number }>}
    */
   async function updateUser(userId, userData, updatedBy) {
@@ -144,7 +147,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that receives the userId and delete its user.
    *
    * @param {String} userId
-   *
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
   async function deleteUser(userId, updatedBy) {
@@ -177,6 +180,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that generates a new password for the user and send it a new one by email
    *
    * @param {String} userId
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>} Object reset password results
    */
   async function resetPassword(userId, updatedBy) {
@@ -226,7 +230,8 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @param {String} userId
    * @param {{}} userData
-   * @returns Promise<{ tests: Object; }>
+   * @param {{}} requestBy Object that includes the information from the user that is doing the request
+   * @returns Promise<{ tests: {} }>
    */
   async function addTestToUser(userId, userData, requestBy) {
 
@@ -247,7 +252,7 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that deletes the user test by its id, as long as the test doesn't have results.
    *
    * @param {String} userTestId
-   *
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise<{ deletedId: String, deletedCount: number }>}
    */
   async function deleteUserTest(userTestId, updatedBy) {
@@ -276,9 +281,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and a property and returns property object of the userId.
+   *
    *
    * @param {String} userId
+   * @param {{}} property
+   * @param {{}} filter
    * @returns {Promise<{ user: {profile: {}}}>}
    */
   async function getUserProperty(userId, property, filter) {
@@ -349,6 +356,7 @@ module.exports = function (InjectedStore, TABLE) {
  *
  * @param {String} testsId
  * @param {{}} testData
+ * @param {{}} updatedBy Object that includes the information from the user that is doing the request
  * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
  */
   async function updateMedicalTest(testsId, testData, updatedBy) {
@@ -368,7 +376,8 @@ module.exports = function (InjectedStore, TABLE) {
   /**
    * Update data in MongoDB from test result
    * @param {String} testsId
-   * @param  {Object} testResultsData
+   * @param  {{}} resultsData
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
    */
   async function upsertMedicalResultsData(testsId, resultsData, updatedBy) {
