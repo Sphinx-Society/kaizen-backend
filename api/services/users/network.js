@@ -25,31 +25,31 @@ const router = express.Router();
 const Router = (validation) => {
 
   /* CRUD OPERATIONS */
-  router.post('/', validation(createUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), insertUser);
-  router.get('/', validation(listUsersSchema, 'query'), jwtAuthMiddleware, scopeValidationMiddleware(['read:listUsers']), listUsers);
-  router.get('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:getUserById']), getUser);
-  router.put('/:userId', validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), jwtAuthMiddleware, scopeValidationMiddleware(['update:updateUserById']), updateUser);
-  router.delete('/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['delete:deleteUserById']), deleteUser);
+  router.post('/', jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), validation(createUserSchema), insertUser);
+  router.get('/', jwtAuthMiddleware, scopeValidationMiddleware(['read:listUsers']), validation(listUsersSchema, 'query'), listUsers);
+  router.get('/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['read:getUserById']), validation({ userId: userIdSchema }, 'params'), getUser);
+  router.put('/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['update:updateUserById']), validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
+  router.delete('/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['delete:deleteUserById']), validation({ userId: userIdSchema }, 'params'), deleteUser);
 
   /* AUTH OPERATIONS */
   router.post('/login', loginUser);
-  router.put('/resetPassword/:userId', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:password']), resetPassword);
+  router.put('/resetPassword/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['update:password']), validation({ userId: userIdSchema }, 'params'), resetPassword);
 
   /* PROFILE OPERATIONS */
-  router.get('/:userId/profile', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:profile']), getUserProfile);
-  router.put('/:userId/profile', validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), jwtAuthMiddleware, scopeValidationMiddleware(['update:profile']), updateUserProfile);
+  router.get('/:userId/profile', jwtAuthMiddleware, scopeValidationMiddleware(['read:profile']), validation({ userId: userIdSchema }, 'params'), getUserProfile);
+  router.put('/:userId/profile', jwtAuthMiddleware, scopeValidationMiddleware(['update:profile']), validation({ userId: userIdSchema }, 'params'), validation(updateUserProfileSchema), updateUserProfile);
 
   /* MEDICAL TESTS OPERATIONS */
-  router.post('/:userId/tests', validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), jwtAuthMiddleware, scopeValidationMiddleware(['create:test']), insertUserTest);
-  router.get('/:userId/tests', validation({ userId: userIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:test']), getUserTests);
-  router.get('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:testById']), getUserTest);
-  router.put('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:testById']), updateMedicalTest);
-  router.delete('/:userId/tests/:testId', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['delete:testById']), deleteUserTest);
+  router.post('/:userId/tests', jwtAuthMiddleware, scopeValidationMiddleware(['create:test']), validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
+  router.get('/:userId/tests', jwtAuthMiddleware, scopeValidationMiddleware(['read:test']), validation({ userId: userIdSchema }, 'params'), getUserTests);
+  router.get('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['read:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
+  router.put('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['update:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
+  router.delete('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['delete:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
 
   /* TEST RESULTS OPERATIONS */
-  router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), getMedicalResults);
-  router.post('/:userId/tests/results/document', validation({ userId: userIdSchema }, 'params'), validation({ testsIds: testsIdsSchema }, 'body'), getResultsPdf);
-  router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), upsertMedicalResults);
+  router.get('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
+  router.post('/:userId/tests/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema }, validation({ testsIds: testsIdsSchema }), 'body'), getResultsPdf);
+  router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
@@ -63,7 +63,8 @@ const Router = (validation) => {
   }
 
   function listUsers(req, res, next) {
-    Controller.listUsers(req.query)
+    const { role } = req.payload;
+    Controller.listUsers(req.query, role)
       .then((user) => {
         response.success(req, res, user, 200);
       })

@@ -4,7 +4,7 @@
  * @param {*} query
  * @returns searchQuery object
  */
-function queryParamsHandler(query) {
+function queryParamsHandler(query, userRole) {
 
   const { role = '', documentId = '' } = query;
   let searchQuery = { 'auth.active': true };
@@ -13,22 +13,28 @@ function queryParamsHandler(query) {
     searchQuery = { ...searchQuery, 'profile.documentId': documentId };
   }
 
-  switch (role) {
-    case 'P':
-      searchQuery = { ...searchQuery, 'auth.role': 'patient' };
-      break;
-    case 'L':
-      searchQuery = { ...searchQuery, 'auth.role': 'lab' };
-      break;
-    case 'D':
-      searchQuery = { ...searchQuery, 'auth.role': 'doctor' };
-      break;
-    case 'A':
-      searchQuery = { ...searchQuery, 'auth.role': 'admin' };
-      break;
-    default:
-      searchQuery = { ...searchQuery };
-      break;
+  if (userRole === 'admin') {
+    switch (role) {
+      case 'P':
+        searchQuery = { ...searchQuery, 'auth.role': 'patient' };
+        break;
+      case 'L':
+        searchQuery = { ...searchQuery, 'auth.role': 'lab' };
+        break;
+      case 'D':
+        searchQuery = { ...searchQuery, 'auth.role': 'doctor' };
+        break;
+      case 'A':
+        searchQuery = { ...searchQuery, 'auth.role': 'admin' };
+        break;
+      default:
+        searchQuery = { ...searchQuery };
+        break;
+    }
+  }
+
+  if (userRole === 'doctor' || userRole === 'lab') {
+    searchQuery = { ...searchQuery, 'auth.role': 'patient' };
   }
 
   return searchQuery;
