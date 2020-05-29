@@ -1,5 +1,4 @@
 const express = require('express');
-const pdf = require('html-pdf');
 const generatorDocument = require('../../../lib/PDF/generator');
 const response = require('../../../network/response');
 const Controller = require('./index');
@@ -14,6 +13,7 @@ const {
   updateUserProfileSchema,
   createUserTestSchema,
   testIdSchema,
+  testsIdsSchema,
 } = require('./schema');
 
 const router = express.Router();
@@ -48,7 +48,7 @@ const Router = (validation) => {
 
   /* TEST RESULTS OPERATIONS */
   router.get('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
-  router.get('/:userId/tests/:testId/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
+  router.post('/:userId/tests/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema }, validation({ testsIds: testsIdsSchema }), 'body'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
 
   /* CRUD OPERATIONS */
@@ -216,18 +216,18 @@ const Router = (validation) => {
 
   /* MISCELLANEOUS */
   function getResultsPdf(req, res, next) {
+    const { testsIds } = req.body;
     const { userId } = req.params;
 
-    Controller.getUserProperty(userId, 'tests', req.params)
-      .then(async (user) => {
-        res.set('Content-Type', 'application/pdf');
-        const file = await generatorDocument(user.tests[0]);
-        pdf.create(file).toStream((err, stream) => {
-          if (err) console.log(err);
-          res.set('Content-type', 'application/pdf');
-          stream.pipe(res);
-        });
-      });
+    if (testsIds.length === 0) throw new Error('testIds property can\'t be empty');
+
+    Controller.getPdfResults(userId, 'tests', testsIds)
+      .then(async (result) => {
+        const pdf = await generatorDocument(result.tests);
+        res.contentType('application/pdf');
+        res.send(pdf);
+      })
+      .catch(next);
   }
 
   return router;

@@ -73,6 +73,8 @@ const createUserTestSchema = {
   }),
 };
 
+const testsIdsSchema = Joi.array().required();
+
 module.exports = {
   userIdSchema,
   createUserSchema,
@@ -81,5 +83,6 @@ module.exports = {
   updateUserProfileSchema,
   createUserTestSchema,
   testIdSchema,
+  testsIdsSchema,
 };
 
