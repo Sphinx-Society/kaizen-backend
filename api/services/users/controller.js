@@ -6,7 +6,7 @@ const paginationHandler = require('../shared/handlers/paginationHandler');
 const loginUserHandler = require('./handlers/loginUser');
 const updateObjectHandler = require('../shared/handlers/updateObjectHandler');
 const createUserTestHandler = require('./handlers/createUserTestHandler');
-const projectionHandler = require('./handlers/projectionHandler');
+const { projectionHandler, pdfProjectionHandler } = require('./handlers/projectionHandler');
 const objectIdHandler = require('../shared/handlers/objectIdHandler');
 const prefixHandler = require('./handlers/prefixHandler');
 const createPasswordHandler = require('./handlers/createPasswordHandler');
@@ -388,6 +388,25 @@ module.exports = function (InjectedStore, TABLE) {
     }
   }
 
+  /**
+   *
+   * @param userId
+   * @param property
+   * @param testsIds
+   * @return {Promise<*>}
+   */
+  async function getPdfResults(userId, property, testsIds) {
+    try {
+      const id = objectIdHandler(userId);
+      const queryProjection = pdfProjectionHandler(testsIds);
+      const operation = [{ $match: id }, { ...queryProjection }];
+      const [result] = await store.aggregate(TABLE, operation);
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   return {
     insertUser,
     listUsers,
@@ -403,5 +422,6 @@ module.exports = function (InjectedStore, TABLE) {
     updateMedicalTest,
     getTestResults,
     upsertMedicalResultsData,
+    getPdfResults,
   };
 };

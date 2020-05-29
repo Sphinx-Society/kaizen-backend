@@ -110,4 +110,26 @@ function projectionHandler(property, filter = {}) {
   return projection;
 }
 
-module.exports = projectionHandler;
+function pdfProjectionHandler(testsIds) {
+  const filter = {
+    input: '$tests',
+    as: 'tests',
+    cond: { $in: ['$$tests.testId', testsIds],
+    },
+  };
+
+  return {
+    '$project': {
+      '_id': 0,
+      'tests': {
+        '$filter': filter,
+      },
+    },
+  };
+}
+
+module.exports = {
+  projectionHandler,
+  pdfProjectionHandler,
+};
+

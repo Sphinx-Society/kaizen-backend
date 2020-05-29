@@ -1,5 +1,4 @@
 const express = require('express');
-const pdf = require('html-pdf');
 const generatorDocument = require('../../../lib/PDF/generator');
 const response = require('../../../network/response');
 const Controller = require('./index');
@@ -48,7 +47,7 @@ const Router = (validation) => {
 
   /* TEST RESULTS OPERATIONS */
   router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), getMedicalResults);
-  router.get('/:userId/tests/:testId/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), getResultsPdf);
+  router.post('/:userId/tests/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), upsertMedicalResults);
 
   /* CRUD OPERATIONS */
@@ -215,18 +214,16 @@ const Router = (validation) => {
 
   /* MISCELLANEOUS */
   function getResultsPdf(req, res, next) {
+    const { testIds } = req.body;
     const { userId } = req.params;
 
-    Controller.getUserProperty(userId, 'tests', req.params)
-      .then(async (user) => {
-        res.set('Content-Type', 'application/pdf');
-        const file = await generatorDocument(user.tests[0]);
-        pdf.create(file).toStream((err, stream) => {
-          if (err) console.log(err);
-          res.set('Content-type', 'application/pdf');
-          stream.pipe(res);
-        });
-      });
+    Controller.getPdfResults(userId, 'tests', testIds)
+      .then(async (result) => {
+        const pdf = await generatorDocument(result.tests);
+        res.contentType('application/pdf');
+        res.send(pdf);
+      })
+      .catch(next);
   }
 
   return router;
