@@ -63,7 +63,8 @@ const Router = (validation) => {
   }
 
   function listUsers(req, res, next) {
-    Controller.listUsers(req.query)
+    const { role } = req.payload;
+    Controller.listUsers(req.query, role)
       .then((user) => {
         response.success(req, res, user, 200);
       })

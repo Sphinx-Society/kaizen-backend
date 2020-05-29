@@ -87,12 +87,10 @@ module.exports = function (InjectedStore, TABLE) {
    * @param {{}} query
    * @returns Promise<{ users: {} }>}
    */
-  async function listUsers(query) {
-
+  async function listUsers(query, userRole) {
     try {
       const { page = 1 } = query;
-
-      const searchQuery = queryParamsHandler(query);
+      const searchQuery = queryParamsHandler(query, userRole);
       const pagination = await paginationHandler(page, store, TABLE, searchQuery);
       const users = await store.list(TABLE, searchQuery, pagination);
 
