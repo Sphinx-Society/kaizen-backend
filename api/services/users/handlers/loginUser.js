@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const boom = require('@hapi/boom');
 const config = require('../../../../config');
 
 module.exports = async function (user, store, collection) {
@@ -9,6 +10,10 @@ module.exports = async function (user, store, collection) {
   const [permissions] = await store.search('permissions', {});
   if (!(await bcrypt.compare(user.password, userFromMongo.auth.password))) {
     throw new Error('Username or password is incorrect');
+  }
+
+  if (userFromMongo.auth.active === false) {
+    throw (boom.unauthorized('Inactive user. Contact your administrator.'));
   }
 
   delete user.password;
