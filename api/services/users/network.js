@@ -13,6 +13,7 @@ const {
   updateUserProfileSchema,
   createUserTestSchema,
   testIdSchema,
+  testsIdsSchema,
 } = require('./schema');
 
 const router = express.Router();
@@ -47,7 +48,7 @@ const Router = (validation) => {
 
   /* TEST RESULTS OPERATIONS */
   router.get('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), getMedicalResults);
-  router.post('/:userId/tests/results/document', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getResultsPdf);
+  router.post('/:userId/tests/results/document', validation({ userId: userIdSchema }, 'params'), validation({ testsIds: testsIdsSchema }, 'body'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), upsertMedicalResults);
 
   /* CRUD OPERATIONS */
@@ -214,10 +215,12 @@ const Router = (validation) => {
 
   /* MISCELLANEOUS */
   function getResultsPdf(req, res, next) {
-    const { testIds } = req.body;
+    const { testsIds } = req.body;
     const { userId } = req.params;
 
-    Controller.getPdfResults(userId, 'tests', testIds)
+    if (testsIds.length === 0) throw new Error('testIds property can\'t be empty');
+
+    Controller.getPdfResults(userId, 'tests', testsIds)
       .then(async (result) => {
         const pdf = await generatorDocument(result.tests);
         res.contentType('application/pdf');
