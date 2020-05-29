@@ -22,7 +22,7 @@ module.exports = async function (user, store, collection) {
     role: userFromMongo.auth.role,
     username: userFromMongo.auth.username,
     active: userFromMongo.auth.active,
-    permission: permissions[userFromMongo.auth.role],
+    permission: permissions[userFromMongo.auth.role] || [],
   };
 
   const token = jwt.sign(payload, config.jwt.secret, {
