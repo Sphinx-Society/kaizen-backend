@@ -35,4 +35,8 @@ module.exports = {
     secretAccessKey: process.env.AWS_SECRET_KEY,
     acl: process.env.AWS_ACL,
   },
+  notifications: {
+    publicKey: process.env.PUSH_NOTIFICATIONS_PUBLIC,
+    privateKey: process.env.PUSH_NOTIFICATIONS_PRIVATE,
+  },
 };

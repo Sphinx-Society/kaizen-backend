@@ -1,6 +1,7 @@
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
+const path = require('path');
 const Routes = require('./api/routes');
 const config = require('./config/index');
 const notFoundMiddleware = require('./middleware/notFoundMiddleware');
@@ -23,6 +24,8 @@ app.use(session({
 }));
 
 Routes(app);
+
+app.use('/webclient', express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res, next) => {
   try {
