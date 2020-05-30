@@ -12,25 +12,24 @@ module.exports = function (InjectedStore, TABLE) {
 
   /**
    * Function that insert a template in database
-   * @param {{}} template
+   * @param {{}} template Object with the new template data
+   * @param {{}} createdBy Object that includes the information from the user that is doing the request
    * @returns {{templateInserted: {})}}
    */
 
-  async function insertTemplate(template) {
-
+  async function insertTemplate(template, createdBy) {
     try {
-
       createdTemplate = {
         ...template,
         name: template.name,
         type: template.type,
         active: true,
         insertedAt: Date.now(),
+        createdBy,
       };
 
       const templateInserted = await store.insert(TABLE, createdTemplate);
       return templateInserted;
-
     } catch (error) {
       throw new Error(error);
     }
@@ -41,15 +40,13 @@ module.exports = function (InjectedStore, TABLE) {
    *
    * @param {String} templateId
    * @param {{}} templateData Object with the data to replace
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise<{"matchedCount": number, "updatedCount": number}>} Update count
    */
-  async function updateTemplate(templateId, templateData) {
-
+  async function updateTemplate(templateId, templateData, updatedBy) {
     try {
       const id = objectIdHandler(templateId);
-      const updateTemplate = updateObjectHandler(templateData);
-
-      //TODO Add createdby from jwt
+      const updateTemplate = updateObjectHandler(templateData, updatedBy);
       const updatedCount = await store.update(TABLE, id, updateTemplate);
       return updatedCount;
     } catch (error) {
@@ -61,15 +58,16 @@ module.exports = function (InjectedStore, TABLE) {
    * Function that deletes a template
    *
    * @param {String} templateId
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
    * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>}
    */
-  async function deleteTemplate(templateId) {
+  async function deleteTemplate(templateId, updatedBy) {
 
     try {
       const updatedAt = Date.now();
       const id = objectIdHandler(templateId);
       const deletedCount = await store.update(TABLE, id,
-        { 'active': false, updatedAt });
+        { 'active': false, updatedAt, updatedBy });
       return deletedCount;
     } catch (error) {
       throw new Error(error);
@@ -110,7 +108,7 @@ module.exports = function (InjectedStore, TABLE) {
   /**
   * Retrieves the data about template searched by id
   * @param { String } templateId
-  * @return {Promise<*>}
+  * @return {Promise<{}>}
   */
   async function getTemplateById(templateId) {
     try {
