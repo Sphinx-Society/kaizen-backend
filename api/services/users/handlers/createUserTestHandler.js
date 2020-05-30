@@ -28,8 +28,7 @@ async function createUserTestHandler(store, TABLE, userId, data, requestBy) {
     tests: {
       testId: nanoid(),
       testName: data.tests.testName,
-      doctorName: data.tests.doctorName,
-      doctorId: data.tests.doctorId,
+      templateId: data.tests.templateId,
       status: 'PENDING',
       requestBy,
       requestedAt: Date.now(),

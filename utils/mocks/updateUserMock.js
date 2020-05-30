@@ -73,8 +73,7 @@ const createUserTestSuccess = {
   'tests':
   {
     'testName': 'Prueba de sangre',
-    'doctorId': '000000000000000000000001',
-    'doctorName': 'JUAN PEREZ RODRIGUEZ',
+    'templateId': '000000000000000000000001',
   },
 };
 

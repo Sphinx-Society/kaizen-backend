@@ -827,8 +827,7 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
     const payload = {
       'testName': 'Análisis Sanguineo',
-      'doctorName': 'José Francisco',
-      'doctorId': '5e30b94546fc3f5c223c4254',
+      'templateId': '5e30b94546fc3f5c223c4254',
       'status': values[Math.floor(Math.random() * values.length)],
     };
 
