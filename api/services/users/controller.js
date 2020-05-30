@@ -89,55 +89,67 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   async function insertUsers(usersFile, createdBy) {
-    const parseStream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
 
-    const filePath = usersFile.path;
-    const fileStream = fs.createReadStream(filePath);
+    return new Promise((resolve, reject) => {
+      const parseStream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
 
-    let count = 1;
-    const usersWithErrors = [];
+      const filePath = usersFile.path;
+      const fileStream = fs.createReadStream(filePath);
 
-    parseStream.on('data', (row) => {
-      count += 1;
+      let count = 1;
+      const usersWithErrors = [];
+      parseStream.on('data', (row) => {
+        count += 1;
 
-      const user = {
+        const user = {
 
-        profile: {
-          firstName: row.firstName,
-          lastName: row.lastName,
-          birthDate: Math.round((new Date(row.birthDate)).getTime() / 1000),
-          phoneNumber: row.phoneNumber,
-          gender: row.gender,
-          country: row.country,
-          documentId: row.documentId,
-        },
-        auth: {
-          email: row.email,
-          role: row.role.toLowerCase(),
-        },
-      };
+          profile: {
+            firstName: row.firstName,
+            lastName: row.lastName,
+            birthDate: Math.round((new Date(row.birthDate)).getTime() / 1000),
+            phoneNumber: row.phoneNumber,
+            gender: row.gender,
+            country: row.country,
+            documentId: row.documentId,
+          },
+          auth: {
+            email: row.email,
+            role: row.role.toLowerCase(),
+          },
+        };
 
-      const error = validate(user, createUserSchema);
-      if (error) {
+        const error = validate(user, createUserSchema);
+        if (error) {
 
-        userError = { ...row, error: error.details[0].message };
-        console.log('insertUsers -> error', `Line ${count} - ${error.details[0].message}`);
-        usersWithErrors.push(userError);
-      } else {
-        insertUser(user, createdBy)
-          .then((results) => console.log('results', results));
-      }
+          userError = { ...row, error: error.details[0].message };
+          console.log('insertUsers -> error', `Line ${count} - ${error.details[0].message}`);
+          usersWithErrors.push(userError);
+        } else {
+          insertUser(user, createdBy)
+            .then((results) => {
+              console.log('results', results);
+            });
+        }
+      });
+
+      parseStream.on('finish', () => {
+        try {
+          const csv = new ObjectsToCsv(usersWithErrors);
+          errorFilePath = './tmp/test.csv';
+          csv.toDisk(errorFilePath)
+            .then(() => {
+              fs.unlinkSync(filePath);
+              resolve(errorFilePath);
+            })
+            .catch((error) => { throw new Error(error); });
+        } catch (error) {
+          throw new Error(error);
+        }
+      });
+
+      parseStream.on('error', (error) => reject(error));
+      fileStream.pipe(parseStream);
     });
-
-    parseStream.on('finish', () => {
-      const csv = new ObjectsToCsv(usersWithErrors);
-      csv.toDisk('./tmp/test.csv');
-      fs.unlinkSync(filePath);
-    });
-
-    fileStream.pipe(parseStream);
-    return './tmp/test.csv';
-
   }
 
   /**
