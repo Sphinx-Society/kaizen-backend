@@ -1,10 +1,13 @@
 const express = require('express');
+const multer = require('multer');
 const generatorDocument = require('../../../lib/PDF/generator');
 const response = require('../../../network/response');
 const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
 const updatedByHelper = require('../../../utils/helpers/updatedByHelper');
+
+const upload = multer({ dest: 'tmp/' });
 const {
   userIdSchema,
   createUserSchema,
@@ -26,6 +29,7 @@ const Router = (validation) => {
 
   /* CRUD OPERATIONS */
   router.post('/', jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), validation(createUserSchema), insertUser);
+  router.post('/massive', jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), upload.single('users'), insertUsers);
   router.get('/', jwtAuthMiddleware, scopeValidationMiddleware(['read:listUsers']), validation(listUsersSchema, 'query'), listUsers);
   router.get('/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['read:getUserById']), validation({ userId: userIdSchema }, 'params'), getUser);
   router.put('/:userId', jwtAuthMiddleware, scopeValidationMiddleware(['update:updateUserById']), validation({ userId: userIdSchema }, 'params'), validation(updateUserSchema), updateUser);
@@ -58,6 +62,16 @@ const Router = (validation) => {
     Controller.insertUser(req.body, createdBy)
       .then((user) => {
         response.success(req, res, user, 201);
+      })
+      .catch(next);
+  }
+
+  function insertUsers(req, res, next) {
+
+    const createdBy = updatedByHelper(req.payload);
+    Controller.insertUsers(req.file, createdBy)
+      .then(async (file) => {
+        await res.download(file);
       })
       .catch(next);
   }
