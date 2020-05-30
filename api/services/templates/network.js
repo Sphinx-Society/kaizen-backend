@@ -3,6 +3,7 @@ const response = require('../../../network/response');
 const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
+const updatedByHelper = require('../../../utils/helpers/updatedByHelper');
 
 const {
   createTemplateSchema,
@@ -20,15 +21,15 @@ const router = express.Router();
 const Router = (validation) => {
 
   /* CRUD OPERATIONS */
-  router.post('/', validation(createTemplateSchema), insertTemplate);
-  router.get('/', validation(listTemplatesSchema, 'query'), listTemplates);
-  router.get('/:templateId', validation({ templateId: templateIdSchema }, 'params'), getTemplate);
-  router.put('/:templateId', validation({ templateId: templateIdSchema }, 'params'), validation(updateTemplateSchema), updateTemplate);
-  router.delete('/:templateId', validation({ templateId: templateIdSchema }, 'params'), deleteTemplate);
+  router.post('/', jwtAuthMiddleware, scopeValidationMiddleware(['create:template']), validation(createTemplateSchema), insertTemplate);
+  router.get('/', jwtAuthMiddleware, scopeValidationMiddleware(['read:templates']), validation(listTemplatesSchema, 'query'), listTemplates);
+  router.get('/:templateId', jwtAuthMiddleware, scopeValidationMiddleware(['read:templateById']), validation({ templateId: templateIdSchema }, 'params'), getTemplate);
+  router.put('/:templateId', jwtAuthMiddleware, scopeValidationMiddleware(['update:templateById']), validation({ templateId: templateIdSchema }, 'params'), validation(updateTemplateSchema), updateTemplate);
+  router.delete('/:templateId', jwtAuthMiddleware, scopeValidationMiddleware(['delete:templateById']), validation({ templateId: templateIdSchema }, 'params'), deleteTemplate);
 
   function insertTemplate(req, res, next) {
-
-    Controller.insertTemplate(req.body)
+    const createdBy = updatedByHelper(req.payload);
+    Controller.insertTemplate(req.body, createdBy)
       .then((template) => {
         response.success(req, res, template, 201);
       })
@@ -36,10 +37,10 @@ const Router = (validation) => {
   }
 
   function updateTemplate(req, res, next) {
-
     const { templateId } = req.params;
     const templateData = req.body;
-    Controller.updateTemplate(templateId, templateData)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.updateTemplate(templateId, templateData, updatedBy)
       .then((template) => {
         response.success(req, res, template, 200);
       })
@@ -56,9 +57,9 @@ const Router = (validation) => {
   }
 
   function deleteTemplate(req, res, next) {
-
     const { templateId } = req.params;
-    Controller.deleteTemplate(templateId)
+    const updatedBy = updatedByHelper(req.payload);
+    Controller.deleteTemplate(templateId, updatedBy)
       .then((template) => {
         response.success(req, res, template, 200);
       })
