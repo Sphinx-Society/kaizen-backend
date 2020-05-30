@@ -41,7 +41,7 @@ const Router = (validation) => {
 
   /* MEDICAL TESTS OPERATIONS */
   router.post('/:userId/tests', jwtAuthMiddleware, scopeValidationMiddleware(['create:test']), validation({ userId: userIdSchema }, 'params'), validation(createUserTestSchema), insertUserTest);
-  router.get('/:userId/tests', jwtAuthMiddleware, scopeValidationMiddleware(['read:test']), validation({ userId: userIdSchema }, 'params'), getUserTests);
+  router.get('/:userId/tests', jwtAuthMiddleware, scopeValidationMiddleware(['read:tests']), validation({ userId: userIdSchema }, 'params'), getUserTests);
   router.get('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['read:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getUserTest);
   router.put('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['update:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), updateMedicalTest);
   router.delete('/:userId/tests/:testId', jwtAuthMiddleware, scopeValidationMiddleware(['delete:testById']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), deleteUserTest);
