@@ -1,3 +1,7 @@
+const fs = require('fs');
+const csv = require('csv-parser');
+const ObjectsToCsv = require('objects-to-csv');
+const papa = require('papaparse');
 const createUserHandler = require('./handlers/createUserHandler');
 const createCredentialsHandler = require('./handlers/createCredentialsHandler');
 const { sendWelcomeEmailHandler, sendRestPasswordEmailHandler } = require('./handlers/sendEmailHandler');
@@ -11,6 +15,10 @@ const objectIdHandler = require('../shared/handlers/objectIdHandler');
 const prefixHandler = require('./handlers/prefixHandler');
 const createPasswordHandler = require('./handlers/createPasswordHandler');
 const AWS = require('../../../lib/AWS');
+const validate = require('../../../utils/helpers/validationHelper');
+const {
+  createUserSchema,
+} = require('./schema');
 
 /**
  * Controller that validate the request information and sends it to the store
@@ -78,6 +86,58 @@ module.exports = function (InjectedStore, TABLE) {
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  async function insertUsers(usersFile, createdBy) {
+    const parseStream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
+
+    const filePath = usersFile.path;
+    const fileStream = fs.createReadStream(filePath);
+
+    let count = 1;
+    const usersWithErrors = [];
+
+    parseStream.on('data', (row) => {
+      count += 1;
+
+      const user = {
+
+        profile: {
+          firstName: row.firstName,
+          lastName: row.lastName,
+          birthDate: Math.round((new Date(row.birthDate)).getTime() / 1000),
+          phoneNumber: row.phoneNumber,
+          gender: row.gender,
+          country: row.country,
+          documentId: row.documentId,
+        },
+        auth: {
+          email: row.email,
+          role: row.role.toLowerCase(),
+        },
+      };
+
+      const error = validate(user, createUserSchema);
+      if (error) {
+
+        userError = { ...row, error: error.details[0].message };
+        console.log('insertUsers -> error', `Line ${count} - ${error.details[0].message}`);
+        usersWithErrors.push(userError);
+      } else {
+        insertUser(user, createdBy)
+          .then((results) => console.log('results', results));
+      }
+    });
+
+    parseStream.on('finish', () => {
+      const csv = new ObjectsToCsv(usersWithErrors);
+      csv.toDisk('./tmp/test.csv');
+      fs.unlinkSync(filePath);
+    });
+
+    fileStream.pipe(parseStream);
+    return './tmp/test.csv';
+
   }
 
   /**
@@ -416,6 +476,7 @@ module.exports = function (InjectedStore, TABLE) {
 
   return {
     insertUser,
+    insertUsers,
     listUsers,
     getUser,
     updateUser,
