@@ -41,6 +41,7 @@ const updateUserSchema = {
     avatar: Joi.string().label('Profile picture').default('').allow(''),
     gender: Joi.string().max(50).label('Gender'),
     country: Joi.string().max(50).label('Country'),
+    documentId: Joi.string().min(4).label('Document ID').allow(''),
   }),
   auth: Joi.object({
     email: Joi.string().label('Email').email({ minDomainSegments: 2, tlds: false }),
