@@ -36,7 +36,7 @@ describe('Testing to generate pdf', () => {
       }
       const file = await fs.existsSync(path);
       expect(file).toBe(true);
-      fs.unlink(path, (err) => {
+      await fs.unlink(path, (err) => {
         if (err) throw new Error('Something went wrong, please try again later');
         console.log('removed');
       });

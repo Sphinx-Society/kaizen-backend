@@ -237,7 +237,7 @@ const Router = (validation) => {
 
     Controller.getPdfResults(userId, 'tests', testsIds)
       .then(async (result) => {
-        const pdf = await generatorDocument(result.tests);
+        const pdf = await generatorDocument(result);
         res.contentType('application/pdf');
         res.send(pdf);
       })

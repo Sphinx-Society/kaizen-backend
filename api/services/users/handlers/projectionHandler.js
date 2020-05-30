@@ -114,13 +114,15 @@ function pdfProjectionHandler(testsIds) {
   const filter = {
     input: '$tests',
     as: 'tests',
-    cond: { $in: ['$$tests.testId', testsIds],
+    cond: {
+      $in: ['$$tests.testId', testsIds],
     },
   };
 
   return {
     '$project': {
       '_id': 0,
+      'profile': 1,
       'tests': {
         '$filter': filter,
       },
