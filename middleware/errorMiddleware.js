@@ -1,6 +1,7 @@
 const boom = require('@hapi/boom');
 const Sentry = require('@sentry/node');
 const config = require('../config');
+const response = require('../network/response');
 const LoggerService = require('../lib/logger');
 
 Sentry.init({ dsn: `https://${config.sentry.sentryDns}@o400538.ingest.sentry.io/${config.sentry.sentryId}` });
@@ -67,11 +68,9 @@ function wrapErrors(err, req, res, next) {
  * @param {*} next
  */
 function errorMiddleware(err, req, res, next) {
-  const {
-    output: { statusCode, payload },
-  } = err;
-  res.status(statusCode);
-  res.json(withErrorStack(payload, err.stack));
+  const { output: { payload } } = err;
+  const _error = withErrorStack(output.payload, err);
+  response.fail(req, res, _error.message, _error.statusCode, _error.error);
 }
 
 module.exports = {

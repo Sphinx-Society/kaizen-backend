@@ -780,8 +780,8 @@ describe('Testing the DELETE [user/test] endpoint', () => {
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
     const deletedResponse = await supertest(app).delete(`/api/${config.api.version}/users/${userId}/tests/${testId}`).set('Authorization', `bearer ${token}`);
 
-    expect(deletedResponse.error).toBe(false);
-    expect(deletedResponse.status).toBe(200);
+    expect(deletedResponse.body.error).toBe('Bad Request');
+    expect(deletedResponse.status).toBe(400);
     expect(deletedResponse.body.message).toBe(messages.SSKB_ERROR_HAS_RESULTS_YET);
 
     await app.close();

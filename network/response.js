@@ -14,3 +14,12 @@ exports.success = function (req, res, message = '', status = 200) {
   });
 };
 
+exports.fail = (req, res, message, status = 500, error) => {
+  const _message = message || 'Internal server error';
+  const _error = error || false;
+  res.status(status).send({
+    error: _error,
+    status,
+    message: _message,
+  });
+};
