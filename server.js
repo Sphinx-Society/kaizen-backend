@@ -1,20 +1,29 @@
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
+const morgan = require('./lib/logger/morgan');
 const Routes = require('./api/routes');
 const config = require('./config/index');
 const notFoundMiddleware = require('./middleware/notFoundMiddleware');
+const Logger = require('./lib/logger');
 const {
   logErrors,
   wrapErrors,
   errorMiddleware,
 } = require('./middleware/errorMiddleware.js');
 
+const logger = new Logger();
+logger.stream = {
+  write: (message) => {
+    logger.info(message);
+  },
+};
+
 const app = express();
-
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(morgan(':method :url :status :response-time ms - :body, :params, :query', { 'stream': logger.stream }));
 
 app.use(session({
   secret: config.server.sessionKey,

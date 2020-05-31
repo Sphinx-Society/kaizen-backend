@@ -237,7 +237,7 @@ const Router = (validation) => {
     const { testsIds } = req.body;
     const { userId } = req.params;
 
-    if (testsIds.length === 0) throw new Error('testIds property can\'t be empty');
+    if (testsIds.length === 0) throw new Error(messages.SSKB_ERROR_PROPERTY_TESTSIDS);
 
     Controller.getPdfResults(userId, 'tests', testsIds)
       .then(async (result) => {
