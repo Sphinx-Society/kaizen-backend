@@ -15,7 +15,8 @@ module.exports = {
   SSKB_ERROR_USER_PSWD_INCORRECT: 'Usuario y/o contraseña incorrectos.',
   SSKB_ERROR_USER_INACTIVE: 'Usuario inactivo. Contacte a su administrador.',
   SSKB_ERROR_PROPERTY_TESTSIDS: 'El objeto no contiene la propiedad "testsIds".',
-  SSKB_ERROR_MIMETYPE: 'El mime-type no es soportado.',
+  SSKB_ERROR_IMAGE_MIMETYPE: 'El tipo de archivo no es soportado. Favor de ingresar una imagen.',
+  SSKB_ERROR_FILE_MIMETYPE: 'El tipo de archivo no es soportado. Favor de ingresar un archivo .csv.',
   SSKB_ERROR_MONGO_INSERTION: 'Error al insertar en la base de datos.',
   SSKB_ERROR_HAS_RESULTS_YET: 'No se ha podido borrar el registro debído a que aun contiene resultados.',
 };

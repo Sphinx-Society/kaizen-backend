@@ -16,32 +16,34 @@ const createPasswordHandler = require('./handlers/createPasswordHandler');
 const AWS = require('../../../lib/AWS');
 const validate = require('../../../utils/helpers/validationHelper');
 const messages = require('../../../config/messages');
+const { validateFileMimeTypes } = require('../../../utils/helpers/validateMimeTypeHelper');
+
 const {
   createUserSchema,
 } = require('./schema');
 
 /**
- * Controller that validate the request information and sends it to the store
- * @param  {} injectedStore
- * @param  {} TABLE
- * @returns {} CRUD functions
- */
+   * Controller that validate the request information and sends it to the store
+   * @param  {} injectedStore
+   * @param  {} TABLE
+   * @returns {} CRUD functions
+   */
 module.exports = function (InjectedStore, TABLE) {
   const store = new InjectedStore();
 
   /**
-   * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
-   *
-   * @param {string} user
-   * @param {{}} createdBy Object that includes the information from the user that is doing the request
-   * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
-   */
+     * Function that insert a user in database, create it's credentials and sends a welcome email with auth information.
+     *
+     * @param {string} user
+     * @param {{}} createdBy Object that includes the information from the user that is doing the request
+     * @returns {{loginUser: loginUser, insertUser: (function(*): *)}} CRUD functions
+     */
   async function insertUser(user, createdBy) {
 
     try {
 
       if (!user) {
-        throw new Error(messages.SSKB_ERROR_INVALID_USER);
+        throw (messages.SSKB_ERROR_INVALID_USER);
       }
 
       const { email } = user.auth;
@@ -49,13 +51,13 @@ module.exports = function (InjectedStore, TABLE) {
       let credentials = await createCredentialsHandler(user);
 
       if (!credentials) {
-        throw new Error(messages.SSKB_ERROR_INVALID_USER);
+        throw (messages.SSKB_ERROR_INVALID_USER);
       }
 
       const createdUser = await createUserHandler(user, credentials, createdBy);
 
       if (!createdUser) {
-        throw new Error(messages.SSKB_ERROR_INVALID_USER);
+        throw (messages.SSKB_ERROR_INVALID_USER);
       }
 
       if (user.profile.avatar && user.profile.avatar !== '') {
@@ -77,7 +79,7 @@ module.exports = function (InjectedStore, TABLE) {
       });
 
       if (!mailId) {
-        throw new Error(messages.SSKB_ERROR_COULDNT_SEND_MAIL);
+        throw (messages.SSKB_ERROR_COULDNT_SEND_MAIL);
       }
 
       credentials = {};
@@ -89,6 +91,8 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   async function insertUsers(usersFile, createdBy) {
+
+    if (!validateFileMimeTypes(usersFile.mimetype)) throw (messages.SSKB_ERROR_FILE_MIMETYPE);
 
     return new Promise((resolve, reject) => {
       const parseStream = papa.parse(papa.NODE_STREAM_INPUT, { header: true });
@@ -133,7 +137,7 @@ module.exports = function (InjectedStore, TABLE) {
 
           /* Do not remove or change this for, if foreach is used, it can't await for the callback to finish.
              For further reading please see https://stackoverflow.com/questions/37576685/using-async-await-with-a-foreach-loop
-          */
+            */
           // eslint-disable-next-line no-restricted-syntax
           for (const user of usersToBeInsert) {
             // eslint-disable-next-line no-await-in-loop
@@ -163,16 +167,17 @@ module.exports = function (InjectedStore, TABLE) {
       parseStream.on('error', (error) => reject(error));
       fileStream.pipe(parseStream);
     });
+
   }
 
   /**
-   * Function that list the active users using pagination by sending the number of the page.
-   * If user doesn't send the page parameter by default starts in 1.
-   *
-   * @param {{}} query
-   * @param {string} userRole
-   * @returns Promise<{ users: {} }>}
-   */
+     * Function that list the active users using pagination by sending the number of the page.
+     * If user doesn't send the page parameter by default starts in 1.
+     *
+     * @param {{}} query
+     * @param {string} userRole
+     * @returns Promise<{ users: {} }>}
+     */
   async function listUsers(query, userRole) {
     try {
       const { page = 1 } = query;
@@ -192,11 +197,11 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
-   *
-   * @param {String} userId
-   * @returns {Promise<{ user: {}}>}
-   */
+     * Function that receives the userId and returns the user object or an empty object if user not exists in DB.
+     *
+     * @param {String} userId
+     * @returns {Promise<{ user: {}}>}
+     */
   async function getUser(userId) {
 
     try {
@@ -208,13 +213,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and delete it.
-   *
-   * @param {String} userId id of the user that will be modified
-   * @param {{}} userData Object that includes the data that will modify the document
-   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-   * @returns {Promise<{ updatedId: String, updatedCount: number }>}
-   */
+     * Function that receives the userId and delete it.
+     *
+     * @param {String} userId id of the user that will be modified
+     * @param {{}} userData Object that includes the data that will modify the document
+     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+     * @returns {Promise<{ updatedId: String, updatedCount: number }>}
+     */
   async function updateUser(userId, userData, updatedBy) {
 
     try {
@@ -229,12 +234,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that receives the userId and delete its user.
-   *
-   * @param {String} userId
-   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
-   */
+     * Function that receives the userId and delete its user.
+     *
+     * @param {String} userId
+     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+     * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+     */
   async function deleteUser(userId, updatedBy) {
 
     try {
@@ -249,32 +254,32 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Validate if user is successfully logged.
-   *
-   * @param user
-   * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
-   */
+     * Validate if user is successfully logged.
+     *
+     * @param user
+     * @returns {Promise<{jwt: (*|undefined)}|{result: number, message: string, status: number}>}
+     */
   async function loginUser(user) {
     if (!user) {
-      throw new Error(messages.SSKB_ERROR_USER_REQUIRED);
+      throw (messages.SSKB_ERROR_USER_REQUIRED);
     }
     return loginUserHandler(user, store, TABLE);
   }
 
   /**
-   * Function that generates a new password for the user and send it a new one by email
-   *
-   * @param {String} userId
-   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-   * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>} Object reset password results
-   */
+     * Function that generates a new password for the user and send it a new one by email
+     *
+     * @param {String} userId
+     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+     * @returns {Promise <{ "matchedCount": number, "updatedCount": number}>} Object reset password results
+     */
   async function resetPassword(userId, updatedBy) {
 
     try {
       const result = await store.get(TABLE, userId, { 'auth.email': 1, 'auth.username': 1, '_id': 0 });
 
       if (!result) {
-        throw new Error(messages.SSKB_ERROR_INVALID_USER);
+        throw (messages.SSKB_ERROR_INVALID_USER);
       }
 
       const { email, username } = result.auth;
@@ -295,7 +300,7 @@ module.exports = function (InjectedStore, TABLE) {
       const mailId = await sendRestPasswordEmailHandler({ email, credentials });
 
       if (!mailId) {
-        throw new Error(messages.SSKB_ERROR_COULDNT_SEND_MAIL);
+        throw (messages.SSKB_ERROR_COULDNT_SEND_MAIL);
       }
 
       hashedPassword = '';
@@ -311,13 +316,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that add a medical test to user
-   *
-   * @param {String} userId
-   * @param {{}} userData
-   * @param {{}} requestBy Object that includes the information from the user that is doing the request
-   * @returns Promise<{ tests: {} }>
-   */
+     * Function that add a medical test to user
+     *
+     * @param {String} userId
+     * @param {{}} userData
+     * @param {{}} requestBy Object that includes the information from the user that is doing the request
+     * @returns Promise<{ tests: {} }>
+     */
   async function addTestToUser(userId, userData, requestBy) {
 
     try {
@@ -334,12 +339,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that deletes the user test by its id, as long as the test doesn't have results.
-   *
-   * @param {String} userTestId
-   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-   * @returns {Promise<{ deletedId: String, deletedCount: number }>}
-   */
+     * Function that deletes the user test by its id, as long as the test doesn't have results.
+     *
+     * @param {String} userTestId
+     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+     * @returns {Promise<{ deletedId: String, deletedCount: number }>}
+     */
   async function deleteUserTest(userTestId, updatedBy) {
 
     try {
@@ -349,7 +354,7 @@ module.exports = function (InjectedStore, TABLE) {
       const existsResults = await store.findAndCount(TABLE, { 'tests': { $elemMatch: { 'testId': userTestId, 'results': { $exists: true } } } });
 
       if (existsResults >= 1) {
-        return messages.SSKB_ERROR_HAS_RESULTS_YET;
+        throw messages.SSKB_ERROR_HAS_RESULTS_YET;
       }
       const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId },
         {
@@ -366,13 +371,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   *
-   *
-   * @param {String} userId
-   * @param {{}} property
-   * @param {{}} filter
-   * @returns {Promise<{ user: {profile: {}}}>}
-   */
+     *
+     *
+     * @param {String} userId
+     * @param {{}} property
+     * @param {{}} filter
+     * @returns {Promise<{ user: {profile: {}}}>}
+     */
   async function getUserProperty(userId, property, filter) {
 
     try {
@@ -390,13 +395,13 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
-   *
-   * @param {String} userId
-   * @param {String} property
-   * @param {{}} filter
-   * @returns {Promise<{tests: {}}>}
-   */
+     * Function that retrieves all tests that match with a filter. Filter can be status = ['D', 'P']
+     *
+     * @param {String} userId
+     * @param {String} property
+     * @param {{}} filter
+     * @returns {Promise<{tests: {}}>}
+     */
   async function getTests(userId, property, filter) {
     try {
 
@@ -413,12 +418,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Function that retrieves the results of an specific user medical test
-   *
-   * @param {String} userId
-   * @param {String} testId
-   * @returns {Promise <{results: {}}>} results
-   */
+     * Function that retrieves the results of an specific user medical test
+     *
+     * @param {String} userId
+     * @param {String} testId
+     * @returns {Promise <{results: {}}>} results
+     */
   async function getTestResults(userId, testId) {
 
     try {
@@ -436,14 +441,14 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
- * Make a request to MongoDB in order to update a medical test info, if data was be updated,
- * the response have a property updatedCount with value 1 otherwise «zero»
- *
- * @param {String} testsId
- * @param {{}} testData
- * @param {{}} updatedBy Object that includes the information from the user that is doing the request
- * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
- */
+   * Make a request to MongoDB in order to update a medical test info, if data was be updated,
+   * the response have a property updatedCount with value 1 otherwise «zero»
+   *
+   * @param {String} testsId
+   * @param {{}} testData
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+   * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
+   */
   async function updateMedicalTest(testsId, testData, updatedBy) {
     try {
       const test = prefixHandler('tests', testData);
@@ -459,17 +464,17 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   * Update data in MongoDB from test result
-   * @param {String} testsId
-   * @param  {{}} resultsData
-   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-   * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
-   */
+     * Update data in MongoDB from test result
+     * @param {String} testsId
+     * @param  {{}} resultsData
+     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+     * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
+     */
   async function upsertMedicalResultsData(testsId, resultsData, updatedBy) {
     try {
       const testResultsData = resultsData;
-      if (Object.entries(testResultsData).length === 0) throw new Error(messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
-      if (!Object.entries(testResultsData)[0].includes('results')) throw new Error(messages.SSKB_ERROR_PROPERTY_RESULTS);
+      if (Object.entries(testResultsData).length === 0) throw (messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
+      if (!Object.entries(testResultsData)[0].includes('results')) throw (messages.SSKB_ERROR_PROPERTY_RESULTS);
 
       testResultsData.results.updatedBy = updatedBy;
       testResultsData.results.updatedAt = Date.now();
@@ -481,12 +486,12 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-   *
-   * @param userId
-   * @param property
-   * @param testsIds
-   * @return {Promise<*>}
-   */
+     *
+     * @param userId
+     * @param property
+     * @param testsIds
+     * @return {Promise<*>}
+     */
   async function getPdfResults(userId, property, testsIds) {
     try {
       const id = objectIdHandler(userId);

@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const app = require('../../server');
 const config = require('../../config');
+const messages = require('../../config/messages');
 const MongoLib = require('../../store/mongo');
 const {
   createUserSuccess,
@@ -384,7 +385,7 @@ describe('Testing the POST [login] endpoint', () => {
     const response = await supertest(app).post(`/api/${config.api.version}/users/login`).send(userLoginFailMock).set('Authorization', `bearer ${token}`);
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe('Username or password is incorrect');
+    expect(response.body.message).toBe(messages.SSKB_ERROR_USER_PSWD_INCORRECT);
 
     await app.close();
     await done();
@@ -397,7 +398,7 @@ describe('Testing the POST [resetPassword] endpoint', () => {
     const response = await supertest(app).put(`/api/${config.api.version}/users/resetPassword/${userId}`).set('Authorization', `bearer ${token}`);
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe('Error: Invalid User');
+    expect(response.body.message).toBe(messages.SSKB_ERROR_INVALID_USER);
 
     await app.close();
     await done();
@@ -695,7 +696,7 @@ describe('Testing the POST [user/tests] endpoint', () => {
 
     expect(createSameTestResponse.body.error).toBe('Bad Request');
     expect(createSameTestResponse.status).toBe(400);
-    expect(createSameTestResponse.body.message).toBe('Error: A pending medical test already exists in user');
+    expect(createSameTestResponse.body.message).toBe(messages.SSKB_ERROR_PENDING_TEST);
 
     const deletedResponse = await store.delete('users', response.body.message.insertedId);
 
@@ -747,7 +748,7 @@ describe('Testing the GET [user/test] endpoint', () => {
 
     expect(response.error).toBe(false);
     expect(response.status).toBe(200);
-    expect(response.body.message).toBe('User doesn\'t exists');
+    expect(response.body.message).toBe(messages.SSKB_ERROR_USER_DOESNT_EXISTS);
 
     await app.close();
     await done();
@@ -773,7 +774,7 @@ describe('Testing the GET [user/test] endpoint', () => {
 
 describe('Testing the DELETE [user/test] endpoint', () => {
 
-  it('Should test the delete test endpoint and return a success message', async (done) => {
+  it('Should test the delete test endpoint with a pending result and return an error message', async (done) => {
 
     const userId = '5ec1c0336ac96a15145fe896';
     const testId = 'e5-l2QGl_R0ZHeonwp5fU';
@@ -781,7 +782,7 @@ describe('Testing the DELETE [user/test] endpoint', () => {
 
     expect(deletedResponse.error).toBe(false);
     expect(deletedResponse.status).toBe(200);
-    expect(deletedResponse.body.message).toBe('Cannot delete because it has results');
+    expect(deletedResponse.body.message).toBe(messages.SSKB_ERROR_HAS_RESULTS_YET);
 
     await app.close();
     await done();
@@ -953,7 +954,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe('Error: Object to update must contain results key');
+    expect(response.body.message).toBe(messages.SSKB_ERROR_PROPERTY_RESULTS);
 
     await app.close();
     await done();
@@ -970,7 +971,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe('Error: Object to update must not be empty');
+    expect(response.body.message).toBe(messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
 
     await app.close();
     await done();

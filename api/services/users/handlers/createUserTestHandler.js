@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid');
 const objectIdHandler = require('../../shared/handlers/objectIdHandler');
-
+const messages = require('../../../../config/messages');
 /**
  * Function that validates if test can be saved in a user.
  *
@@ -17,12 +17,12 @@ async function createUserTestHandler(store, TABLE, userId, data, requestBy) {
   const isPatient = await store.countDocuments(TABLE, { $and: [id, { 'auth.role': 'patient' }] });
 
   if (isPatient !== 1) {
-    throw new Error(messages.SSKB_ERROR_USER_NOT_BE_A_PATIENT);
+    throw (messages.SSKB_ERROR_USER_NOT_BE_A_PATIENT);
   }
   const count = await store.countDocuments(TABLE, { $and: [id, { 'tests.testName': data.tests.testName }, { 'tests.status': 'PENDING' }] });
 
   if (count >= 1) {
-    throw new Error(messages.SSKB_ERROR_PENDING_TEST);
+    throw (messages.SSKB_ERROR_PENDING_TEST);
   }
   const updatedData = {
     tests: {
