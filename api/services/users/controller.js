@@ -150,7 +150,7 @@ module.exports = function (InjectedStore, TABLE) {
           const csv = new ObjectsToCsv(usersWithErrors);
           errorFilePath = './tmp/test.csv';
           csv.toDisk(errorFilePath)
-            .then(async () => {
+            .then(() => {
               fs.unlinkSync(filePath);
               resolve(errorFilePath);
             })
