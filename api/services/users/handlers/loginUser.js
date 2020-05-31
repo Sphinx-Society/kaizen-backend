@@ -9,11 +9,11 @@ module.exports = async function (user, store, collection) {
   const [userFromMongo] = await store.search(collection, query);
   const [permissions] = await store.search('permissions', {});
   if (!(await bcrypt.compare(user.password, userFromMongo.auth.password))) {
-    throw new Error('Username or password is incorrect');
+    throw new Error(messages.SSKB_ERROR_USER_PSWD_INCORRECT);
   }
 
   if (userFromMongo.auth.active === false) {
-    throw (boom.unauthorized('Inactive user. Contact your administrator.'));
+    throw (boom.unauthorized(message.SSKB_ERROR_USER_INACTIVE));
   }
 
   delete user.password;

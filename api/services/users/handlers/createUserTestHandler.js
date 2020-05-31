@@ -17,12 +17,12 @@ async function createUserTestHandler(store, TABLE, userId, data, requestBy) {
   const isPatient = await store.countDocuments(TABLE, { $and: [id, { 'auth.role': 'patient' }] });
 
   if (isPatient !== 1) {
-    throw new Error('This user is not a patient');
+    throw new Error(messages.SSKB_ERROR_USER_NOT_BE_A_PATIENT);
   }
   const count = await store.countDocuments(TABLE, { $and: [id, { 'tests.testName': data.tests.testName }, { 'tests.status': 'PENDING' }] });
 
   if (count >= 1) {
-    throw new Error('A pending medical test already exists in user');
+    throw new Error(messages.SSKB_ERROR_PENDING_TEST);
   }
   const updatedData = {
     tests: {

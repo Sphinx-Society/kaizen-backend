@@ -33,8 +33,8 @@ function logErrors(err, req, res, next) {
   if (err) {
     Sentry.captureException(err);
     const logger = new LoggerService();
-    logger.error('[ERROR]', {
-      output: { statusCode, payload },
+    logger.error(err.output.payload.message, {
+      output,
     } = err);
 
     next(err);

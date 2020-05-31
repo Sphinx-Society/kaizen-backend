@@ -1,5 +1,4 @@
 const fs = require('fs');
-const csv = require('csv-parser');
 const ObjectsToCsv = require('objects-to-csv');
 const papa = require('papaparse');
 const createUserHandler = require('./handlers/createUserHandler');
@@ -16,6 +15,7 @@ const prefixHandler = require('./handlers/prefixHandler');
 const createPasswordHandler = require('./handlers/createPasswordHandler');
 const AWS = require('../../../lib/AWS');
 const validate = require('../../../utils/helpers/validationHelper');
+const messages = require('../../../config/messages');
 const {
   createUserSchema,
 } = require('./schema');
@@ -41,7 +41,7 @@ module.exports = function (InjectedStore, TABLE) {
     try {
 
       if (!user) {
-        throw new Error('Invalid User');
+        throw new Error(messages.SSKB_ERROR_INVALID_USER);
       }
 
       const { email } = user.auth;
@@ -49,13 +49,13 @@ module.exports = function (InjectedStore, TABLE) {
       let credentials = await createCredentialsHandler(user);
 
       if (!credentials) {
-        throw new Error('Invalid User');
+        throw new Error(messages.SSKB_ERROR_INVALID_USER);
       }
 
       const createdUser = await createUserHandler(user, credentials, createdBy);
 
       if (!createdUser) {
-        throw new Error('Invalid User');
+        throw new Error(messages.SSKB_ERROR_INVALID_USER);
       }
 
       if (user.profile.avatar && user.profile.avatar !== '') {
@@ -77,7 +77,7 @@ module.exports = function (InjectedStore, TABLE) {
       });
 
       if (!mailId) {
-        throw new Error('Email couldn\'t sent');
+        throw new Error(messages.SSKB_ERROR_COULDNT_SEND_MAIL);
       }
 
       credentials = {};
@@ -142,7 +142,7 @@ module.exports = function (InjectedStore, TABLE) {
               const userError = {
                 ...user.profile,
                 ...user.auth,
-                error: 'Cannot be inserted in database',
+                error: messages.SSKB_ERROR_MONGO_INSERTION,
               };
               usersWithErrors.push(userError);
             }
@@ -256,7 +256,7 @@ module.exports = function (InjectedStore, TABLE) {
    */
   async function loginUser(user) {
     if (!user) {
-      throw new Error('User is required');
+      throw new Error(messages.SSKB_ERROR_USER_REQUIRED);
     }
     return loginUserHandler(user, store, TABLE);
   }
@@ -274,7 +274,7 @@ module.exports = function (InjectedStore, TABLE) {
       const result = await store.get(TABLE, userId, { 'auth.email': 1, 'auth.username': 1, '_id': 0 });
 
       if (!result) {
-        throw new Error('Invalid User');
+        throw new Error(messages.SSKB_ERROR_INVALID_USER);
       }
 
       const { email, username } = result.auth;
@@ -295,7 +295,7 @@ module.exports = function (InjectedStore, TABLE) {
       const mailId = await sendRestPasswordEmailHandler({ email, credentials });
 
       if (!mailId) {
-        throw new Error('Email couldn\'t sent');
+        throw new Error(messages.SSKB_ERROR_COULDNT_SEND_MAIL);
       }
 
       hashedPassword = '';
@@ -349,7 +349,7 @@ module.exports = function (InjectedStore, TABLE) {
       const existsResults = await store.findAndCount(TABLE, { 'tests': { $elemMatch: { 'testId': userTestId, 'results': { $exists: true } } } });
 
       if (existsResults >= 1) {
-        return 'Cannot delete because it has results';
+        return messages.SSKB_ERROR_HAS_RESULTS_YET;
       }
       const deletedCount = await store.update(TABLE, { 'tests.testId': userTestId },
         {
@@ -381,7 +381,7 @@ module.exports = function (InjectedStore, TABLE) {
 
       const user = await store.get(TABLE, userId, queryProjection);
 
-      if (!user) return 'User doesn\'t exists';
+      if (!user) return messages.SSKB_ERROR_USER_DOESNT_EXISTS;
 
       return user[property] !== undefined ? { ...user } : `Property "${property}" doesn't exists in user`;
     } catch (error) {
@@ -468,8 +468,8 @@ module.exports = function (InjectedStore, TABLE) {
   async function upsertMedicalResultsData(testsId, resultsData, updatedBy) {
     try {
       const testResultsData = resultsData;
-      if (Object.entries(testResultsData).length === 0) throw new Error('Object to update must not be empty');
-      if (!Object.entries(testResultsData)[0].includes('results')) throw new Error('Object to update must contain results key');
+      if (Object.entries(testResultsData).length === 0) throw new Error(messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
+      if (!Object.entries(testResultsData)[0].includes('results')) throw new Error(messages.SSKB_ERROR_PROPERTY_RESULTS);
 
       testResultsData.results.updatedBy = updatedBy;
       testResultsData.results.updatedAt = Date.now();

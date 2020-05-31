@@ -1,6 +1,7 @@
 const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const config = require('../../config');
+const messages = require('../../config/messages');
 
 const strategyOpts = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -9,7 +10,7 @@ const strategyOpts = {
 
 const actionStrategy = (tokenPayload, done) => {
   if (!tokenPayload) {
-    throw new Error('Token from authorization not found');
+    throw new Error(messages.SSKB_TOKEN_AUTH_NOT_FOUND);
   }
   done(null, { ...tokenPayload });
 };
