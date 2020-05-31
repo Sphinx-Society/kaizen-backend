@@ -98,11 +98,12 @@ module.exports = function (InjectedStore, TABLE) {
 
       let count = 1;
       const usersWithErrors = [];
-      parseStream.on('data', (row) => {
+      const usersToBeInsert = [];
+      parseStream.on('data', async (row) => {
+
         count += 1;
 
         const user = {
-
           profile: {
             firstName: row.firstName,
             lastName: row.lastName,
@@ -120,24 +121,36 @@ module.exports = function (InjectedStore, TABLE) {
 
         const error = validate(user, createUserSchema);
         if (error) {
-
-          userError = { ...row, error: error.details[0].message };
-          console.log('insertUsers -> error', `Line ${count} - ${error.details[0].message}`);
+          userError = { ...row, error: `Line ${count} - ${error.details[0].message}` };
           usersWithErrors.push(userError);
         } else {
-          insertUser(user, createdBy)
-            .then((results) => {
-              console.log('results', results);
-            });
+          usersToBeInsert.push(user);
         }
       });
 
-      parseStream.on('finish', () => {
+      parseStream.on('finish', async () => {
         try {
+
+          /* Do not remove or change this for, if foreach is used, it can't await for the callback to finish.
+             For further reading please see https://stackoverflow.com/questions/37576685/using-async-await-with-a-foreach-loop
+          */
+          // eslint-disable-next-line no-restricted-syntax
+          for (const user of usersToBeInsert) {
+            // eslint-disable-next-line no-await-in-loop
+            const results = await insertUser(user, createdBy);
+            if (results.insertedCount === 0) {
+              const userError = {
+                ...user.profile,
+                ...user.auth,
+                error: 'Cannot be inserted in database',
+              };
+              usersWithErrors.push(userError);
+            }
+          }
           const csv = new ObjectsToCsv(usersWithErrors);
           errorFilePath = './tmp/test.csv';
           csv.toDisk(errorFilePath)
-            .then(() => {
+            .then(async () => {
               fs.unlinkSync(filePath);
               resolve(errorFilePath);
             })
