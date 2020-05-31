@@ -1,6 +1,9 @@
 const boom = require('@hapi/boom');
+const Sentry = require('@sentry/node');
 const config = require('../config');
 const LoggerService = require('../lib/logger');
+
+Sentry.init({ dsn: `https://${config.sentry.sentryDns}@o400538.ingest.sentry.io/${config.sentry.sentryId}` });
 
 /**
  * Middleware that shows the error stack if the environment is different to production and send it to the next middleware.
@@ -28,6 +31,7 @@ function withErrorStack(error, stack) {
 function logErrors(err, req, res, next) {
 
   if (err) {
+    Sentry.captureException(err);
     const logger = new LoggerService();
     logger.error('[ERROR]', {
       output: { statusCode, payload },
