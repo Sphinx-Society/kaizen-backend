@@ -6,11 +6,11 @@
  */
 function queryParamsHandler(query, userRole) {
 
-  const { role = '', documentId = '' } = query;
+  const { role = '', q = '' } = query;
   let searchQuery = { 'auth.active': true };
 
-  if (documentId) {
-    searchQuery = { ...searchQuery, 'profile.documentId': documentId };
+  if (q !== '') {
+    searchQuery = { ...searchQuery, $text: { $search: q } };
   }
 
   if (userRole === 'admin') {
