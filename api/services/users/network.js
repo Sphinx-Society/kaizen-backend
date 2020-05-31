@@ -27,7 +27,6 @@ const router = express.Router();
  * @param  {} validation
  */
 const Router = (validation) => {
-  router.post('/subscribe', subscribeNotification);
 
   /* CRUD OPERATIONS */
   router.post('/', jwtAuthMiddleware, scopeValidationMiddleware(['create:user']), validation(createUserSchema), insertUser);
@@ -56,6 +55,9 @@ const Router = (validation) => {
   router.get('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
   router.post('/:userId/tests/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema }, validation({ testsIds: testsIdsSchema }), 'body'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+
+  /* MISCELLANEOUS */
+  router.post('/subscribe', subscribeNotification);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
