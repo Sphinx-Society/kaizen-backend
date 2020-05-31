@@ -69,7 +69,8 @@ function wrapErrors(err, req, res, next) {
  */
 function errorMiddleware(err, req, res, next) {
   const { output: { payload } } = err;
-  response.fail(req, res, withErrorStack(payload, err.stack), output.statusCode);
+  const _error = withErrorStack(output.payload, err);
+  response.fail(req, res, _error.message, _error.statusCode, _error.error);
 }
 
 module.exports = {
