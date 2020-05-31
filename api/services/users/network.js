@@ -6,6 +6,7 @@ const Controller = require('./index');
 const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
 const updatedByHelper = require('../../../utils/helpers/updatedByHelper');
+const webpush = require('../../../lib/Notifications');
 
 const upload = multer({ dest: 'tmp/' });
 const {
@@ -54,6 +55,9 @@ const Router = (validation) => {
   router.get('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
   router.post('/:userId/tests/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema }, validation({ testsIds: testsIdsSchema }), 'body'), getResultsPdf);
   router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+
+  /* MISCELLANEOUS */
+  router.post('/subscribe', subscribeNotification);
 
   /* CRUD OPERATIONS */
   function insertUser(req, res, next) {
@@ -242,6 +246,20 @@ const Router = (validation) => {
         res.send(pdf);
       })
       .catch(next);
+  }
+
+  async function subscribeNotification(req, res, send) {
+    res.status(200).json();
+    const payload = JSON.stringify({
+      title: 'Kaizen Notification',
+      message: 'Welcome',
+    });
+
+    try {
+      await webpush.sendNotification(req.body, payload);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return router;
