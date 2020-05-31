@@ -49,7 +49,7 @@ app.get('/', (req, res, next) => {
 
 app.use(notFoundMiddleware);
 
-app.use(wrapErrors);
+// app.use(wrapErrors);
 app.use(logErrors);
 app.use(errorMiddleware);
 
