@@ -27,7 +27,7 @@ const updateTemplateFieldSchema =
     'type': Joi.string().label('Field type').valid('string', 'number', 'select', 'text', 'file'),
     'minLimit': Joi.number().label('Field minimum limit').precision(2),
     'maxLimit': Joi.number().label('Field maximum limit').precision(2),
-    'unit': Joi.string().label('Field unit').max(100),
+    'unit': Joi.string().label('Field unit').max(100).allow(''),
     'options': Joi.array().label('Field options'),
     'required': Joi.boolean().label('Field required').default(false),
   });
