@@ -35,4 +35,8 @@ module.exports = {
     secretAccessKey: process.env.AWS_SECRET_KEY,
     acl: process.env.AWS_ACL,
   },
+  sentry: {
+    sentryDns: process.env.SENTRY_DNS,
+    sentryId: process.env.SENTRY_ID,
+  },
 };
