@@ -258,7 +258,7 @@ const Router = (validation) => {
     try {
       await webpush.sendNotification(req.body, payload);
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
   }
 

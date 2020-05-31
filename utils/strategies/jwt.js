@@ -10,7 +10,7 @@ const strategyOpts = {
 
 const actionStrategy = (tokenPayload, done) => {
   if (!tokenPayload) {
-    throw new Error(messages.SSKB_TOKEN_AUTH_NOT_FOUND);
+    throw (messages.SSKB_TOKEN_AUTH_NOT_FOUND);
   }
   done(null, { ...tokenPayload });
 };

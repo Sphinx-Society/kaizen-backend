@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const boom = require('@hapi/boom');
 const config = require('../../../../config');
+const messages = require('../../../../config/messages');
 
 module.exports = async function (user, store, collection) {
 
@@ -9,11 +10,11 @@ module.exports = async function (user, store, collection) {
   const [userFromMongo] = await store.search(collection, query);
   const [permissions] = await store.search('permissions', {});
   if (!(await bcrypt.compare(user.password, userFromMongo.auth.password))) {
-    throw new Error(messages.SSKB_ERROR_USER_PSWD_INCORRECT);
+    throw (messages.SSKB_ERROR_USER_PSWD_INCORRECT);
   }
 
   if (userFromMongo.auth.active === false) {
-    throw (boom.unauthorized(message.SSKB_ERROR_USER_INACTIVE));
+    throw (boom.unauthorized(messages.SSKB_ERROR_USER_INACTIVE));
   }
 
   delete user.password;

@@ -32,13 +32,12 @@ describe('Testing to generate pdf', () => {
     const pdf = await generateDocument(data);
     fs.writeFile(path, pdf, async (err) => {
       if (err) {
-        return console.log(err);
+        throw new Error(messages.SSKB_ERROR_TRY_AGAIN);
       }
       const file = await fs.existsSync(path);
       expect(file).toBe(true);
       await fs.unlink(path, (err) => {
         if (err) throw new Error(messages.SSKB_ERROR_TRY_AGAIN);
-        console.log('removed');
       });
     });
 
