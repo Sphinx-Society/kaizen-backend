@@ -37,5 +37,6 @@ module.exports = async function (user, store, collection) {
   return {
     jwt: token,
     id: userFromMongo._id,
+    swKey: config.notifications.publicKey,
   };
 };

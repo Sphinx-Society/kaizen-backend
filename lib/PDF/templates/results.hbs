@@ -1,17 +1,198 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Kaizen Medical Results Test</title>
+  <style>
+    body {
+      margin: 50px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 50px;
+    }
+
+    .header__logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 25%;
+    }
+
+    .header__logo figure {
+      margin: 0;
+      padding: 0;
+    }
+
+    .header__logo img {
+      width: 50px;
+    }
+
+    .header__title {
+      text-align: center;
+      width: 100%;
+    }
+
+    .tests__date {
+      display: flex;
+      justify-content: flex-end;
+      margin: 20px;
+      font-size: small;
+
+    }
+
+    .patient__info {
+      border-top: 1px solid #E9E9E9;
+      border-bottom: 1px solid #E9E9E9;
+      padding: 10px;
+    }
+
+    .patient__info h3 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .patient__container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .patient__container p {
+      padding: 5px;
+    }
+
+    .test__name {
+      margin: 20px 0px;
+    }
+
+    .test__name p {
+      margin: 10px 0px;
+    }
+
+    .test__results {
+      margin: 20px 0px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #E9E9E9;
+    }
+
+    .result__name {
+      margin: 20px 0px;
+      background-color: #B5E2FA;
+      padding: 5px;
+    }
+
+    .result__units {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .result__info {
+      text-align: right;
+      font-size: small;
+      margin-top: 20px;
+    }
+
+    .result__resume {
+      margin: 20px;
+    }
+  </style>
 </head>
+
 <body>
-{{#each this}}
-  <p>{{ testId }}</p>
-  <p>{{ testName }}</p>
-  <p>{{ doctorName }}</p>
-  <p>{{ doctorId }}</p>
-  <p>{{ status }}</p>
-  <p>{{ updatedAt }}</p>
-{{/each}}
+  <header>
+    <div class="header__logo">
+      <figure>
+
+        <img src="{{img}}" alt="" />
+
+
+      </figure>
+    </div>
+    <div class="header__title">
+      <h1>Informe de Resultados</h1>
+    </div>
+  </header>
+  <section class="patient__info">
+    <h3>Información del Paciente</h3>
+    <div class="patient__container">
+      <p>Paciente: </p>
+      <p>{{ profile.firstName}} {{profile.lastName}} </p>
+      <p>ID del paciente: </p>
+      <p>{{profile.documentId}} </p>
+      <p>Fecha de nacimiento: </p>
+      <p>
+        {{#date profile.birthDate}}
+        {{this}}
+        {{/date}}
+      </p>
+      <p>Género: </p>
+      <p>{{profile.gender}}</p>
+      <p>Teléfono: </p>
+      <p>{{profile.phoneNumber}} </p>
+    </div>
+  </section>
+
+  {{#each tests}}
+  <section class="tests__results">
+    <div class="test">
+      <div class="test__name">
+        <h3>{{ testName }}</h3>
+      </div>
+      <div class="test__results">
+        {{#each results}}
+        <div class="result">
+          <div class="result__name">
+            <p><b>{{ name }}</b></p>
+          </div>
+          <div class="result__values">
+            <div class="result__units">
+              <p>Valor mínimo:
+                {{#check min undefined}}
+                {{this}}
+                {{/check}}
+
+              </p>
+              <p>Valor máximo:
+                {{#check max undefined}}
+                {{this}}
+                {{/check}}
+              </p>
+              <p>Unidad:
+                {{#check unit undefined}}
+                {{this}}
+                {{/check}}
+              </p>
+            </div>
+            <div class="result__resume">
+              <p>Resultado: <b>{{ value }}</b></p>
+            </div>
+          </div>
+
+          <div class="result__info">
+            <p>Realizado por: {{ updatedBy.firstName}} {{updatedBy.lastName}} </p>
+            <div>
+              Fecha de resultado
+              {{#dateTime updatedAt}}
+              {{this}}
+              {{/dateTime}}
+            </div>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+  {{/each}}
+  {{!--  {{/each}} --}}
 </body>
+
 </html>

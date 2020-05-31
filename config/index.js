@@ -39,4 +39,8 @@ module.exports = {
     publicKey: process.env.PUSH_NOTIFICATIONS_PUBLIC,
     privateKey: process.env.PUSH_NOTIFICATIONS_PRIVATE,
   },
+  sentry: {
+    sentryDns: process.env.SENTRY_DNS,
+    sentryId: process.env.SENTRY_ID,
+  },
 };

@@ -3,15 +3,6 @@ const Joi = require('@hapi/joi');
 const userIdSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/);
 const testIdSchema = Joi.string().regex(/^[0-9a-zA-Z_/-]{21}$/);
 
-const createAuthUserSchema = {
-  auth: Joi.object({
-    email: Joi.string().email({ minDomainSegments: 2, tlds: false }).required(),
-    role: Joi.string().max(50).example('Patient, Doctor, Laboratory, Admin').required(),
-    isConfirmed: Joi.boolean().default(false),
-    active: Joi.boolean().default(true),
-  }),
-};
-
 const createUserSchema = {
   profile: Joi.object().keys({
     firstName: Joi.string().label('First Name').max(100).required(),
@@ -69,8 +60,7 @@ const updateUserProfileSchema = {
 const createUserTestSchema = {
   tests: Joi.object({
     testName: Joi.string().label('Test Name').max(100),
-    doctorId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
-    doctorName: Joi.string().label('Doctor Name').max(100),
+    templateId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
   }),
 };
 
