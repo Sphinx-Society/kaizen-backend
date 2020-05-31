@@ -42,7 +42,7 @@ const updateUserSchema = {
 const listUsersSchema = {
   page: Joi.number().min(1).allow(''),
   role: Joi.string().label('Role').valid('P', 'D', 'L', 'A').allow(''),
-  documentId: Joi.string().min(4).label('Document ID').allow(''),
+  q: Joi.string().label('Query').allow(''),
 };
 
 const updateUserProfileSchema = {

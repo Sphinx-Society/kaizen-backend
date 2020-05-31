@@ -247,7 +247,7 @@ describe('Testing the GET [users] endpoint', () => {
   it('Should test the get users endpoint with documentId parameter existing in DB and return a success message', async (done) => {
 
     const documentId = '12345678909';
-    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`).set('Authorization', `bearer ${token}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?q=${documentId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);
@@ -262,7 +262,7 @@ describe('Testing the GET [users] endpoint', () => {
   it('Should test the get users endpoint with documentId parameter non-existent in DB and return a success message', async (done) => {
 
     const documentId = '12234556778';
-    const response = await supertest(app).get(`/api/${config.api.version}/users?documentId=${documentId}`).set('Authorization', `bearer ${token}`);
+    const response = await supertest(app).get(`/api/${config.api.version}/users?q=${documentId}`).set('Authorization', `bearer ${token}`);
 
     expect(response.status).toBe(200);
     expect(response.error).toBe(false);

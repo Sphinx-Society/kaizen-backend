@@ -182,6 +182,7 @@ module.exports = function (InjectedStore, TABLE) {
     try {
       const { page = 1 } = query;
       const searchQuery = queryParamsHandler(query, userRole);
+      console.log('listUsers -> searchQuery', searchQuery);
       const pagination = await paginationHandler(page, store, TABLE, searchQuery);
       const users = await store.list(TABLE, searchQuery, pagination);
 
