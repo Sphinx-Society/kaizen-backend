@@ -225,6 +225,17 @@ module.exports = function (InjectedStore, TABLE) {
     try {
       const id = objectIdHandler(userId);
       const updateUser = updateObjectHandler(userData, updatedBy);
+      const base64regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+
+      if (updateUser.avatar && updateUser.avatar === '') {
+        if (base64regex.test(updateUser.avatar)) {
+          const aws = new AWS();
+          const upload = await aws.uploadAvatar(updateUser.avatar, updateUser.auth.username, updateUser.avatar.avatarMimeType);
+          if (upload) {
+            updateUser.avatar = upload.Location;
+          }
+        }
+      }
 
       const updatedCount = await store.update(TABLE, id, updateUser);
       return updatedCount;
