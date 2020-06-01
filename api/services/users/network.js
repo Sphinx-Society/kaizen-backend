@@ -167,7 +167,7 @@ const Router = (validation) => {
     const { userId } = req.params;
     const userData = req.body;
     const requestBy = updatedByHelper(req.payload);
-    res.send(userData).status(200);
+
     Controller.addTestToUser(userId, userData.tests, requestBy)
       .then(async (user) => {
         await webpush.sendNotification(userData.subscribe, {
@@ -233,7 +233,7 @@ const Router = (validation) => {
     const { testResultsData } = req.body;
     const payload = {
       results: testResultsData.results,
-      status: testResultsData.status,
+      status: testResultsData.results,
     };
     const updatedBy = updatedByHelper(req.payload);
     Controller.upsertMedicalResultsData(userId, testId, payload, updatedBy)
