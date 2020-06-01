@@ -18,6 +18,7 @@ const {
   createUserTestSchema,
   testIdSchema,
   testsIdsSchema,
+  updateTestResultsSchema,
 } = require('./schema');
 
 const router = express.Router();
@@ -54,7 +55,7 @@ const Router = (validation) => {
   /* TEST RESULTS OPERATIONS */
   router.get('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['read:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), getMedicalResults);
   router.post('/:userId/tests/results/document', jwtAuthMiddleware, scopeValidationMiddleware(['read:resultsDocuments']), validation({ userId: userIdSchema }, validation({ testsIds: testsIdsSchema }), 'body'), getResultsPdf);
-  router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), upsertMedicalResults);
+  router.put('/:userId/tests/:testId/results', jwtAuthMiddleware, scopeValidationMiddleware(['update:results']), validation({ userId: userIdSchema, testId: testIdSchema }, 'params'), validation(updateTestResultsSchema), upsertMedicalResults);
 
   /* MISCELLANEOUS */
   router.post('/subscribe', subscribeNotification);
@@ -222,10 +223,10 @@ const Router = (validation) => {
   }
 
   function upsertMedicalResults(req, res, next) {
-    const { testId } = req.params;
+    const { userId, testId } = req.params;
     const testResultsData = req.body;
     const updatedBy = updatedByHelper(req.payload);
-    Controller.upsertMedicalResultsData(testId, testResultsData, updatedBy)
+    Controller.upsertMedicalResultsData(userId, testId, testResultsData, updatedBy)
       .then((user) => {
         response.success(req, res, user, 200);
       })
