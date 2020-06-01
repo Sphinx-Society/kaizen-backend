@@ -63,7 +63,14 @@ const createUserTestSchema = {
     testName: Joi.string().label('Test Name').max(100),
     templateId: Joi.string().regex(/^[0-9a-fA-F]{24}$/),
   }),
-  subscribe: Joi.object({}),
+  subscribe: Joi.object().keys({
+    endpoint: Joi.string(),
+    expirationTime: Joi.any(),
+    keys: Joi.object({
+      p256dh: Joi.string(),
+      auth: Joi.string(),
+    }),
+  }),
 };
 
 const testsIdsSchema = Joi.array().required();
@@ -79,7 +86,14 @@ const updateTemplateItemsSchema = Joi.object().keys({
 const updateTestResultsSchema = {
   results: Joi.array().items(updateTemplateItemsSchema).required(),
   status: Joi.string().label('Status'),
-  subscribe: Joi.object({}),
+  subscribe: Joi.object().keys({
+    endpoint: Joi.string(),
+    expirationTime: Joi.any(),
+    keys: Joi.object({
+      p256dh: Joi.string(),
+      auth: Joi.string(),
+    }),
+  }),
 };
 
 module.exports = {
