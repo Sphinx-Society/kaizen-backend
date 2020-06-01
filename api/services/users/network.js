@@ -168,7 +168,7 @@ const Router = (validation) => {
     const userData = req.body;
     const requestBy = updatedByHelper(req.payload);
     res.send(userData).status(200);
-    /*Controller.addTestToUser(userId, userData, requestBy)
+    Controller.addTestToUser(userId, userData, requestBy)
       .then(async (user) => {
         await webpush.sendNotification(req.body, {
           title: messages.SSKB_MSG_TITLE_NOTIFICATION,
@@ -176,7 +176,7 @@ const Router = (validation) => {
         });
         response.success(req, res, user, 200);
       })
-      .catch(next);*/
+      .catch(next);
   }
 
   function getUserTest(req, res, next) {
