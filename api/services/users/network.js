@@ -233,7 +233,7 @@ const Router = (validation) => {
     const { testResultsData } = req.body;
     const payload = {
       results: testResultsData.results,
-      status: testResultsData.results,
+      status: testResultsData.status,
     };
     const updatedBy = updatedByHelper(req.payload);
     Controller.upsertMedicalResultsData(userId, testId, payload, updatedBy)
