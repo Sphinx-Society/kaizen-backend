@@ -20,5 +20,8 @@ module.exports = {
   SSKB_ERROR_MONGO_INSERTION: 'Error al insertar en la base de datos.',
   SSKB_ERROR_HAS_RESULTS_YET: 'No se ha podido borrar el registro debído a que aun contiene resultados.',
   SSKB_ERROR_RESULTS_HAS_DONE: 'Los resultados del test ya han sido cerrados.',
+  SSKB_MSG_TITLE_NOTIFICATION: 'Kaizen Medical Notification',
+  SSKB_MSG_TEST_ASSOC_NOTIFICATION: 'Se le informa que se le han asocidao examenes a su perfil',
+  SSKB_MSG_TEST_RESULTS_NOTIFICATION: 'Se le informa que los resultados de su examen ya están disponibles',
 };
 
