@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi');
+const { updateTemplateFieldSchema } = require('../templates/schema');
 
 const userIdSchema = Joi.string().regex(/^[0-9a-fA-F]{24}$/);
 const testIdSchema = Joi.string().regex(/^[0-9a-zA-Z_/-]{21}$/);
@@ -66,6 +67,19 @@ const createUserTestSchema = {
 
 const testsIdsSchema = Joi.array().required();
 
+const updateTemplateItemsSchema = Joi.object().keys({
+  'name': Joi.string().label('Field name').max(100),
+  'value': Joi.string().label('Field name').max(100),
+  'min': Joi.number().label('Field minimum limit').precision(2),
+  'max': Joi.number().label('Field maximum limit').precision(2),
+  'unit': Joi.string().label('Field unit').max(100).allow(''),
+});
+
+const updateTestResultsSchema = {
+  results: Joi.array().items(updateTemplateItemsSchema).required(),
+  status: Joi.string().label('Status').required(),
+};
+
 module.exports = {
   userIdSchema,
   createUserSchema,
@@ -75,5 +89,6 @@ module.exports = {
   createUserTestSchema,
   testIdSchema,
   testsIdsSchema,
+  updateTestResultsSchema,
 };
 

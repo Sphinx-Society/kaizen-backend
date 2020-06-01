@@ -464,25 +464,38 @@ module.exports = function (InjectedStore, TABLE) {
   }
 
   /**
-     * Update data in MongoDB from test result
-     * @param {String} testsId
-     * @param  {{}} resultsData
-     * @param {{}} updatedBy Object that includes the information from the user that is doing the request
-     * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
-     */
-  async function upsertMedicalResultsData(testsId, resultsData, updatedBy) {
-    try {
-      const testResultsData = resultsData;
-      if (Object.entries(testResultsData).length === 0) throw (messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
-      if (!Object.entries(testResultsData)[0].includes('results')) throw (messages.SSKB_ERROR_PROPERTY_RESULTS);
+   * Update data in MongoDB from test result
+   * @param {String} userId
+   * @param testId
+   * @param  {{}} resultsData
+   * @param {{}} updatedBy Object that includes the information from the user that is doing the request
+   * @return {Promise <{ "matchedCount": number, "updatedCount": number}>}
+   */
+  async function upsertMedicalResultsData(userId, testId, resultsData, updatedBy) {
+    const testResultsData = resultsData;
+    if (Object.entries(testResultsData).length === 0) throw (messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
 
-      testResultsData.results.updatedBy = updatedBy;
-      testResultsData.results.updatedAt = Date.now();
-      const updateResults = prefixHandler('tests', testResultsData);
-      return await store.update(TABLE, { 'tests.testId': testsId }, updateResults);
-    } catch (error) {
-      throw new Error(error);
-    }
+    const id = objectIdHandler(userId);
+    const operation = [{ $match: id },
+      { '$project': {
+        '_id': 0,
+        'tests': {
+          '$filter': {
+            'input': '$tests',
+            'as': 'tests',
+            'cond': { '$eq': ['$$tests.testId', testId] },
+          },
+        },
+      } }];
+
+    const [result] = await store.aggregate(TABLE, operation);
+
+    if (result.tests[0].status === 'DONE') throw new Error(messages.SSKB_ERROR_RESULTS_HAS_DONE);
+
+    testResultsData.results.updatedBy = updatedBy;
+    testResultsData.results.updatedAt = Date.now();
+    const updateResults = prefixHandler('tests', testResultsData);
+    return store.update(TABLE, { 'tests.testId': testId }, updateResults);
   }
 
   /**
