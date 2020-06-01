@@ -77,7 +77,7 @@ const updateTemplateItemsSchema = Joi.object().keys({
 
 const updateTestResultsSchema = {
   results: Joi.array().items(updateTemplateItemsSchema).required(),
-  status: Joi.string().label('Status').required(),
+  status: Joi.string().label('Status'),
 };
 
 module.exports = {

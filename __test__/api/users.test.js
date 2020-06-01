@@ -879,16 +879,18 @@ describe('Testing the PUT [user/test] endpoint', () => {
 
 describe('Testing the PUT [user/results] endpoint', () => {
   it('Should test the update user/test/results endpoint and return a success message', async (done) => {
-    const userId = '5ec1c0336ac96a15145fe896';
-    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING', 'CORRUPTED', 'INDETERMINATE'];
-    const val = () => values[Math.floor(Math.random() * values.length)];
+    const userId = '5ecb1beddf85c6885f986af5';
+    const testId = 'PbLf_FRHxj3RXgZw_CiLO';
     const payload = {
-      'results': {
-        'COVID-19': val(),
-        'SARS': val(),
-        'MERS': val(),
-      },
+      'results': [
+        {
+          'value': '0.3',
+          'name': 'Urea',
+          'min': '0.3',
+          'max': '0.6',
+          'unit': 'U',
+        },
+      ],
     };
 
     const response = await supertest(app)
@@ -900,52 +902,27 @@ describe('Testing the PUT [user/results] endpoint', () => {
     expect(response.body.message).toHaveProperty('matchedCount');
     expect(response.body.message.matchedCount).toBe(1);
     expect(response.body.message).toHaveProperty('updatedCount');
-    expect(response.body.message.updatedCount).toBe(1);
+    expect(response.body.message.updatedCount).toBe(0);
 
     await app.close();
     await done();
 
   });
 
-  it('Should test the update user/test/results endpoint and return a success message', async (done) => {
-    const userId = '5ec1c0336ac96a15145fe896';
-    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
-
+  it('Should test the update user/test/results endpoint and return a fail message advising that has been done ', async (done) => {
+    const userId = '5ecb1beddf85c6885f986af5';
+    const testId = 'qsOLPieVPnNNx7Gp4SpHa';
     const payload = {
-      'results': {
-        'COVID-19': values[Math.floor(Math.random() * values.length)],
-        'SARS': values[Math.floor(Math.random() * values.length)],
-        'MERS': values[Math.floor(Math.random() * values.length)],
-      },
-    };
-
-    const response = await supertest(app)
-      .put(`/api/${config.api.version}/users/${userId}/tests/${testId}/results`)
-      .send(payload).set('Authorization', `bearer ${token}`);
-
-    expect(response.error).toBe(false);
-    expect(response.status).toBe(200);
-    expect(response.body.message).toHaveProperty('matchedCount');
-    expect(response.body.message.matchedCount).toBe(1);
-    expect(response.body.message).toHaveProperty('updatedCount');
-    expect(response.body.message.updatedCount).toBe(1);
-
-    await app.close();
-    await done();
-  });
-
-  it('Should test the update user/test/results endpoint and return a fail message advising about key ', async (done) => {
-    const userId = '5ec1c0336ac96a15145fe896';
-    const testId = 'e5-l2QGl_R0ZHeonwp5fU';
-    const values = ['POSITIVO', 'NEGATIVO', 'UNDEFINED', 'PENDING'];
-
-    const payload = {
-      'result': {
-        'COVID-19': values[Math.floor(Math.random() * values.length)],
-        'SARS': values[Math.floor(Math.random() * values.length)],
-        'MERS': values[Math.floor(Math.random() * values.length)],
-      },
+      'results': [
+        {
+          'value': '0.3',
+          'name': 'Urea',
+          'min': '0.3',
+          'max': '0.6',
+          'unit': 'U',
+        },
+      ],
+      'status': 'DONE',
     };
 
     const response = await supertest(app)
@@ -954,7 +931,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe(messages.SSKB_ERROR_PROPERTY_RESULTS);
+    expect(response.body.message).toBe(messages.SSKB_ERROR_RESULTS_HAS_DONE);
 
     await app.close();
     await done();
@@ -971,7 +948,7 @@ describe('Testing the PUT [user/results] endpoint', () => {
 
     expect(response.status).toBe(400);
     expect(response.body.error).toBe('Bad Request');
-    expect(response.body.message).toBe(messages.SSKB_ERROR_MUSTNT_BE_EMPTY);
+    expect(response.body.message).toBe('"results" is required');
 
     await app.close();
     await done();
