@@ -9,6 +9,11 @@ module.exports = async function (user, store, collection) {
   const query = { 'auth.username': user.username };
   const [userFromMongo] = await store.search(collection, query);
   const [permissions] = await store.search('permissions', {});
+
+  if (permissions === undefined) {
+    throw (messages.SSKB_ERROR_USER_PSWD_INCORRECT);
+  }
+
   if (!(await bcrypt.compare(user.password, userFromMongo.auth.password))) {
     throw (messages.SSKB_ERROR_USER_PSWD_INCORRECT);
   }
