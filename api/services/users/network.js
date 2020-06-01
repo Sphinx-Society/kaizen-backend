@@ -7,6 +7,7 @@ const jwtAuthMiddleware = require('../../../middleware/jwtMiddleware');
 const scopeValidationMiddleware = require('../../../middleware/scopeValidationMiddleware');
 const updatedByHelper = require('../../../utils/helpers/updatedByHelper');
 const webpush = require('../../../lib/Notifications');
+const messages = require('../../../config/messages');
 
 const upload = multer({ dest: 'tmp/' });
 const {
@@ -166,8 +167,13 @@ const Router = (validation) => {
     const { userId } = req.params;
     const userData = req.body;
     const requestBy = updatedByHelper(req.payload);
+    res.send(userData).status(200);
     Controller.addTestToUser(userId, userData, requestBy)
-      .then((user) => {
+      .then(async (user) => {
+        await webpush.sendNotification(req.body, {
+          title: messages.SSKB_MSG_TITLE_NOTIFICATION,
+          message: messages.SSKB_MSG_TEST_ASSOC_NOTIFICATION,
+        });
         response.success(req, res, user, 200);
       })
       .catch(next);
@@ -224,10 +230,14 @@ const Router = (validation) => {
 
   function upsertMedicalResults(req, res, next) {
     const { userId, testId } = req.params;
-    const testResultsData = req.body;
+    const { testResultsData } = req.body;
     const updatedBy = updatedByHelper(req.payload);
     Controller.upsertMedicalResultsData(userId, testId, testResultsData, updatedBy)
-      .then((user) => {
+      .then(async (user) => {
+        await webpush.sendNotification(testResultsData.subscription, {
+          title: messages.SSKB_MSG_TITLE_NOTIFICATION,
+          message: messages.SSKB_MSG_TEST_RESULTS_NOTIFICATION,
+        });
         response.success(req, res, user, 200);
       })
       .catch(next);
@@ -252,7 +262,7 @@ const Router = (validation) => {
   async function subscribeNotification(req, res, send) {
     res.status(200).json();
     const payload = JSON.stringify({
-      title: 'Kaizen Notification',
+      title: messages.SSKB_MSG_TITLE_NOTIFICATION,
       message: 'Welcome',
     });
 
