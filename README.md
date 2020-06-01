@@ -4,6 +4,8 @@
 
 API for open source web application for managing clinical laboratory tests.
 
+The API url is [here](https://kaizen-medical.herokuapp.com/)
+
 
 ### Documentation
 
