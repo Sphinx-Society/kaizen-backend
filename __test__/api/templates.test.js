@@ -286,6 +286,20 @@ describe('Testing the GET [templates] endpoint', () => {
     await app.close();
     await done();
   });
+
+  it('Should test the get templates endpoint with a query parameter and return a success message', async (done) => {
+
+    const q = 'sangre';
+    const response = await supertest(app).get(`/api/${config.api.version}/templates?q=${q}`).set('Authorization', `bearer ${token}`);
+
+    expect(response.status).toBe(200);
+    expect(response.error).toBe(false);
+
+    expect(response.body.message).toHaveProperty(['templates']);
+
+    await app.close();
+    await done();
+  });
 });
 
 describe('Testing the GET [templates/id] endpoint', () => {

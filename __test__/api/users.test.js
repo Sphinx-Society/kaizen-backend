@@ -5,6 +5,7 @@ const messages = require('../../config/messages');
 const MongoLib = require('../../store/mongo');
 const {
   createUserSuccess,
+  createUserAvatarSuccess,
   createUserFirstNameError,
   createUserLastNameError,
   createUserBirthDateError,
@@ -223,6 +224,30 @@ describe('Testing the POST [users] endpoint', () => {
     expect(response.status).toBe(201);
     expect(response.body.message.insertedId).toHaveLength(24);
     expect(response.body.message.insertedCount).toBe(1);
+
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
+
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
+
+    await app.close();
+    await done();
+
+  });
+
+  it('Should test the post users endpoint with an avatar and return a success message', async (done) => {
+
+    const response = await supertest(app).post(`/api/${config.api.version}/users`).send(createUserAvatarSuccess).set('Authorization', `bearer ${token}`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(201);
+    expect(response.body.message.insertedId).toHaveLength(24);
+    expect(response.body.message.insertedCount).toBe(1);
+
+    const deletedResponse = await store.delete('users', response.body.message.insertedId);
+
+    expect(deletedResponse.deletedId).toHaveLength(24);
+    expect(deletedResponse.deletedCount).toBe(1);
 
     await app.close();
     await done();
@@ -1022,3 +1047,25 @@ describe('Testing the GET [user/test/results] endpoint', () => {
 
 });
 
+describe('Testing the POST [user/test/results/documents] endpoint', () => {
+
+  it('Should test the get user/test/results/document endpoint and return a success message', async (done) => {
+
+    const userId = '5ecf1d552dff15275a7d8d1c';
+    const testIds = {
+      'testsIds': [
+        'CLdmNaU_1_gt-FzxqPNt1',
+        'CLdmNaU_1_gt-FzxqPNtc',
+      ],
+    };
+    const response = await supertest(app).post(`/api/${config.api.version}/users/${userId}/tests/results/document`).send(testIds).set('Authorization', `bearer ${token}`);
+
+    expect(response.error).toBe(false);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty(['type']);
+
+    await app.close();
+    await done();
+
+  });
+});
