@@ -168,7 +168,7 @@ const Router = (validation) => {
     const userData = req.body;
     const requestBy = updatedByHelper(req.payload);
 
-    Controller.addTestToUser(userId, userData.tests, requestBy)
+    Controller.addTestToUser(userId, userData, requestBy)
       .then(async (user) => {
         await webpush.sendNotification(userData.subscribe, {
           title: messages.SSKB_MSG_TITLE_NOTIFICATION,
@@ -230,7 +230,7 @@ const Router = (validation) => {
 
   function upsertMedicalResults(req, res, next) {
     const { userId, testId } = req.params;
-    const { testResultsData } = req.body;
+    const testResultsData = req.body;
     const payload = {
       results: testResultsData.results,
       status: testResultsData.results,
